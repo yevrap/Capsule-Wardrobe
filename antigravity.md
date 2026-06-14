@@ -32,9 +32,15 @@ time from `compressed`.
 ### 3. Multi-profile data model from day one
 
 `ownerId` is on every `Garment`, `Outfit`, and `WearLog`. The family wardrobe
-(self / partner / child) is the intended end state. Retrofitting ownerId later
-means a schema migration on real user data — painful. The UI for switching
-profiles can arrive later; the data layer cannot.
+is the intended end state. Retrofitting ownerId later means a schema migration
+on real user data — painful. The UI for switching profiles can arrive later;
+the data layer cannot.
+
+The `role` field (`'self' | 'partner' | 'child'`) exists in the schema but is
+not exposed in the UI. Roles added cognitive overhead during onboarding and
+editing without providing any current functionality — all filtering is by
+`ownerId`, not role. If roles ever power a feature (e.g. child sizing), add
+UI then; don't burden users now. New profiles default to `'self'`.
 
 ### 4. Scoring is rule-based, not AI
 
@@ -151,6 +157,8 @@ the image).
 | Use negative margins for full-bleed layout | When `overflow-x: hidden` is set on `html`, negative-margin children get clipped. Structure pages so full-width sections have their own padding instead. |
 | Font-size below 16px on inputs    | iOS Safari auto-zooms on focus for inputs smaller than 16px. The global 16px must not be overridden smaller. |
 | MIME type `application/zip` in Web Share | Android auto-opens the file with its unzipper. Use `application/octet-stream` for the share target. |
+| Expose profile roles in UI        | The `role` field exists in the schema but carries no functional weight yet. Showing it forces users to make a choice that doesn't do anything. Add UI only when roles power a real feature. |
+| Gate onboarding on profile setup  | Forcing users to name and configure profiles before they can use the app is friction with no payoff. Create a sensible default ("My Wardrobe") and let them rename it in Settings. |
 
 ---
 

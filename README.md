@@ -9,10 +9,12 @@ A local-first wardrobe inventory PWA for families. Dark, editorial, offline-firs
 ## What it does
 
 - Catalogue your wardrobe with photos, tags, brand, price, notes
-- Multiple profiles — self, partner, child
+- Multiple profiles — one app for the whole family
+- Create and save outfits from items in your wardrobe
 - Search and filter by category, tag, or text
 - Full backup and restore per profile (ZIP file, works on iOS, Android, and desktop)
 - Installs as a PWA on iPhone, Android, Mac, and web
+- Manage profiles and check for app updates from the Settings tab
 
 ## Local development
 

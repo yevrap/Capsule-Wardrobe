@@ -34,21 +34,26 @@ src/
     export.ts             — exportProfile() — ZIP export via JSZip
     import.ts             — previewImport(), runImport() — ZIP import
   components/
-    Nav.tsx + Nav.module.css      — bottom tab bar (mobile) / sidebar (desktop)
-    Layout.tsx                    — wraps Nav around page content
-    GarmentForm.tsx + .module.css — shared Add/Edit form
-    PhotoUploader.tsx + .module.css — multi-photo upload with compression
-    TagInput.tsx + .module.css    — chip-based tag input
+    Nav.tsx + Nav.module.css         — bottom tab bar (mobile) / sidebar (desktop)
+    Layout.tsx + Layout.module.css   — wraps Nav around page content
+    GarmentForm.tsx + .module.css    — shared Add/Edit garment form
+    OutfitForm.tsx + .module.css     — shared Add/Edit outfit form
+    PhotoUploader.tsx + .module.css  — multi-photo upload with compression
+    TagInput.tsx + .module.css       — chip-based tag input
+    UpdatePrompt.tsx + .module.css   — floating banner when a SW update is ready
   hooks/
     useInventoryFilter.ts — search + category + tag filter logic
   pages/
-    Onboarding.tsx + .module.css  — welcome → profile setup → done
-    Inventory.tsx + .module.css   — garment grid with search, category, tag filter
-    AddGarment.tsx                — wraps GarmentForm for new item creation
-    ItemDetail.tsx + .module.css  — full item view with photo strip + delete
-    EditGarment.tsx + .module.css — wraps GarmentForm for editing an existing item
-    Outfits.tsx                   — Phase 2 stub
-    DataPage.tsx + .module.css    — export/import UI with progress reporting
+    Onboarding.tsx + .module.css   — one-tap welcome; creates a default profile
+    Inventory.tsx + .module.css    — garment grid with search, category, tag filter
+    AddGarment.tsx                 — wraps GarmentForm for new item creation
+    ItemDetail.tsx + .module.css   — full item view with photo strip + delete
+    EditGarment.tsx + .module.css  — wraps GarmentForm for editing an existing item
+    Outfits.tsx + .module.css      — outfit grid; tap to view, + to create
+    AddOutfit.tsx                  — wraps OutfitForm for new outfit creation
+    OutfitDetail.tsx + .module.css — outfit view with garment tiles + delete
+    EditOutfit.tsx                 — wraps OutfitForm for editing an existing outfit
+    SettingsPage.tsx + .module.css — profile management, app updates, export/import
   styles/
     global.css            — design tokens + reset + reusable classes
 ```
@@ -57,16 +62,16 @@ src/
 
 ## Phase status
 
-| Phase | Status      | Description                                              |
-|-------|-------------|----------------------------------------------------------|
-| 0     | ✅ complete  | PWA shell, DB schema, onboarding, nav                    |
-| 1     | ✅ complete  | Photo upload, garment form, inventory grid, search/filter, export/import, edit/delete |
-| 2     | next        | Outfits, wear log, cost-per-wear                         |
-| 3     | later       | Scores, weather fit, insights dashboard                  |
-| 4     | later       | Comparison quiz + Elo preference ranking                 |
-| 5     | later       | AI auto-tagging + tag OCR                               |
-| 6     | later       | AI virtual try-on                                        |
-| 7     | later       | Multi-profile UI, baby growth tracking, optional sync    |
+| Phase | Status           | Description                                              |
+|-------|------------------|----------------------------------------------------------|
+| 0     | ✅ complete       | PWA shell, DB schema, onboarding, nav                    |
+| 1     | ✅ complete       | Photo upload, garment form, inventory grid, search/filter, export/import, edit/delete, Settings page, profile management |
+| 2     | 🔄 in progress   | Outfits ✅ (list, create, detail, edit, delete) · wear log, cost-per-wear next |
+| 3     | later            | Scores, weather fit, insights dashboard                  |
+| 4     | later            | Comparison quiz + Elo preference ranking                 |
+| 5     | later            | AI auto-tagging + tag OCR                               |
+| 6     | later            | AI virtual try-on                                        |
+| 7     | later            | Baby growth tracking, optional sync                      |
 
 ---
 
@@ -74,7 +79,7 @@ src/
 
 All types live in `src/types/index.ts`. Key relationships:
 
-- `Profile` → identified by `id`, role: `'self' | 'partner' | 'child'`
+- `Profile` → identified by `id`; `role: 'self' | 'partner' | 'child'` is in the schema but **not exposed in UI** — all new profiles default to `'self'`. The name is the only user-visible identifier.
 - `Garment` → `ownerId` references `Profile.id`; `photos: GarmentPhoto[]` stores Blobs
 - `Outfit` → `garmentIds[]` references garments; `ownerId` references Profile
 - `WearLog` → records a wear event per day; links garments + optional outfit
