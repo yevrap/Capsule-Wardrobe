@@ -1,0 +1,229 @@
+/* ─── Design tokens ──────────────────────────────────────────────────────────
+   All colours, spacing, and type decisions live here.
+   Components reference variables only — never hard-coded values.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Backgrounds — near-black editorial palette */
+  --c-bg:        #0A0A0A;  /* page background */
+  --c-surface:   #141414;  /* cards, inputs */
+  --c-surface-2: #1E1E1E;  /* hover states, nested surfaces */
+  --c-border:    #2A2A2A;  /* dividers, input borders */
+
+  /* Text */
+  --c-text:       #F0EDE8;  /* primary — warm white */
+  --c-text-muted: #6B6B6B;  /* secondary labels */
+  --c-text-faint: #3A3A3A;  /* placeholder, disabled */
+
+  /* Accent — warm cream/gold (editorial, not loud) */
+  --c-accent:     #C8B89A;
+  --c-accent-dim: #8B7355;
+
+  /* Semantic */
+  --c-danger:  #E05353;
+  --c-success: #5EAD6F;
+  --c-warning: #D4964A;
+
+  /* Radius */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+
+  /* Typography */
+  --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Layout */
+  --nav-height:   64px;
+  --sidebar-w:    220px;
+  --content-max:  960px;
+
+  /* Safe areas (iOS notch / home indicator) */
+  --safe-top:    env(safe-area-inset-top,    0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left,   0px);
+  --safe-right:  env(safe-area-inset-right,  0px);
+}
+
+/* ─── Reset ──────────────────────────────────────────────────────────────────*/
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100svh;
+  overscroll-behavior: none;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+/* ─── Typography scale ───────────────────────────────────────────────────────*/
+
+h1 { font-size: 2rem;    font-weight: 300; letter-spacing: -0.03em; line-height: 1.1; }
+h2 { font-size: 1.35rem; font-weight: 400; letter-spacing: -0.02em; }
+h3 { font-size: 1.05rem; font-weight: 500; letter-spacing: -0.01em; }
+
+.label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+/* ─── Base elements ──────────────────────────────────────────────────────────*/
+
+a { color: inherit; text-decoration: none; }
+
+img { display: block; max-width: 100%; }
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  -webkit-appearance: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: 15px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  color: var(--c-text);
+  padding: 10px 14px;
+  width: 100%;
+  outline: none;
+  -webkit-appearance: none;
+  transition: border-color 0.15s;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--c-accent-dim);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--c-text-faint);
+}
+
+/* ─── Reusable component classes ─────────────────────────────────────────────*/
+
+/* Primary action button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--c-accent);
+  color: #0A0A0A;
+}
+
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { opacity: 0.75; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--c-text-muted);
+  border: 1px solid var(--c-border);
+}
+
+.btn-ghost:hover {
+  border-color: var(--c-text-muted);
+  color: var(--c-text);
+}
+
+.btn-danger {
+  background: var(--c-danger);
+  color: #fff;
+}
+
+/* Card surface */
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--c-border);
+  border: none;
+}
+
+/* Empty state container */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 24px;
+  text-align: center;
+  color: var(--c-text-muted);
+}
+
+.empty-state h3 {
+  color: var(--c-text);
+}
+
+/* Form field wrapper */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+/* Scrollable page content (accounts for bottom nav on mobile) */
+.page {
+  padding: 24px 20px calc(var(--nav-height) + var(--safe-bottom) + 24px);
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
+
+/* On wide screens the sidebar takes space — page shifts right */
+@media (min-width: 768px) {
+  .page {
+    padding: 32px 40px 40px;
+    margin-left: var(--sidebar-w);
+  }
+}
