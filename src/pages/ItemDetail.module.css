@@ -1,5 +1,5 @@
 .detail {
-  padding-bottom: calc(var(--safe-bottom) + 24px);
+  padding-bottom: 24px;
   max-width: var(--content-max);
   margin: 0 auto;
 }

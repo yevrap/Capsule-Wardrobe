@@ -209,17 +209,17 @@ input[type='number'] { -moz-appearance: textfield; }
 }
 
 /* Page padding — used by most page-level containers.
-   No bottom padding for nav height: the nav is in the document flow (not fixed),
-   so it naturally sits below the page content.
-   Only the safe-area bottom is added so content doesn't hide behind the home indicator. */
+   No bottom padding for nav height: the nav is in the document flow and sits
+   below the scroll container, so it never overlaps content.
+   No safe-bottom padding either: the nav bar already handles that internally. */
 .page {
-  padding: 24px 20px calc(var(--safe-bottom) + 24px);
+  padding: 24px 20px 24px;
   max-width: var(--content-max);
   margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .page {
-    padding: 32px 40px calc(var(--safe-bottom) + 40px);
+    padding: 32px 40px 40px;
   }
 }

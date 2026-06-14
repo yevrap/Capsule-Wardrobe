@@ -17,6 +17,10 @@
 .content {
   flex: 1;
   min-height: 0; /* critical: lets flex child shrink below its content size */
+  /* Push content below the iOS status bar in PWA standalone mode.
+     safe-top is non-zero only when apple-mobile-web-app-status-bar-style
+     is black-translucent (i.e. status bar overlaps the app). */
+  padding-top: var(--safe-top);
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
