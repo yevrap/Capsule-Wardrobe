@@ -6,6 +6,7 @@ import { Inventory } from '@/pages/Inventory';
 import { AddGarment } from '@/pages/AddGarment';
 import { ItemDetail } from '@/pages/ItemDetail';
 import { Outfits } from '@/pages/Outfits';
+import { DataPage } from '@/pages/DataPage';
 
 // AppRoutes is a child of ProfileProvider so it can read profile state.
 function AppRoutes() {
@@ -33,6 +34,7 @@ function AppRoutes() {
         <Route path="/add"        element={<AddGarment />} />
         <Route path="/item/:id"  element={<ItemDetail />} />
         <Route path="/outfits"   element={<Outfits />} />
+        <Route path="/data"      element={<DataPage />} />
         <Route path="*"          element={<Navigate to="/inventory" replace />} />
       </Routes>
     </Layout>
