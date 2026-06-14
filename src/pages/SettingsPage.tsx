@@ -8,33 +8,10 @@ import { previewImport, runImport, type ImportPreview, type ImportProgress } fro
 import type { Profile, ProfileRole } from '@/types';
 import styles from './SettingsPage.module.css';
 
+// Role is stored in the data model but not exposed in the UI.
+const DEFAULT_ROLE: ProfileRole = 'self';
+
 // ─── Profile management ───────────────────────────────────────────────────────
-
-const ROLE_LABELS: Record<string, string> = { self: 'Me', partner: 'Partner', child: 'Child' };
-const ROLE_KEYS: ProfileRole[] = ['self', 'partner', 'child'];
-
-function RoleChips({
-  value,
-  onChange,
-}: {
-  value: ProfileRole;
-  onChange: (r: ProfileRole) => void;
-}) {
-  return (
-    <div className={styles.profileRoleChips}>
-      {ROLE_KEYS.map((r) => (
-        <button
-          key={r}
-          type="button"
-          className={[styles.roleChip, value === r ? styles.roleChipActive : ''].join(' ')}
-          onClick={() => onChange(r)}
-        >
-          {ROLE_LABELS[r]}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 function ProfileEditor({
   profile,
@@ -46,20 +23,17 @@ function ProfileEditor({
   const { profiles, activeProfile, setActiveProfileId } = useProfiles();
   const [editing, setEditing] = useState(false);
   const [draftName, setDraftName] = useState(profile.name);
-  const [draftRole, setDraftRole] = useState<ProfileRole>(profile.role);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     if (!editing) {
       setDraftName(profile.name);
-      setDraftRole(profile.role);
       setConfirmDelete(false);
     }
-  }, [profile.name, profile.role, editing]);
+  }, [profile.name, editing]);
 
   function cancel() {
     setDraftName(profile.name);
-    setDraftRole(profile.role);
     setConfirmDelete(false);
     setEditing(false);
   }
@@ -67,7 +41,7 @@ function ProfileEditor({
   async function save() {
     const name = draftName.trim();
     if (!name) return;
-    await db.profiles.update(profile.id, { name, role: draftRole });
+    await db.profiles.update(profile.id, { name });
     setEditing(false);
   }
 
@@ -102,8 +76,6 @@ function ProfileEditor({
             autoFocus
           />
         </div>
-
-        <RoleChips value={draftRole} onChange={setDraftRole} />
 
         <div className={styles.profileExpandedActions}>
           <div className={styles.profileDeleteZone}>
@@ -145,7 +117,6 @@ function ProfileEditor({
       <div className={styles.profileDisplayRow}>
         <div className={styles.profileItemInfo}>
           <span className={styles.profileItemName}>{profile.name}</span>
-          <span className={styles.profileItemRole}>{ROLE_LABELS[profile.role] ?? profile.role}</span>
         </div>
         <button type="button" className={styles.profileRenameBtn} onClick={() => setEditing(true)}>
           Edit
@@ -157,7 +128,6 @@ function ProfileEditor({
 
 function AddProfileForm({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState('');
-  const [role, setRole] = useState<ProfileRole>('self');
   const [saving, setSaving] = useState(false);
 
   async function handleAdd() {
@@ -168,7 +138,7 @@ function AddProfileForm({ onDone }: { onDone: () => void }) {
       await db.profiles.add({
         id: generateId(),
         name: trimmed,
-        role,
+        role: DEFAULT_ROLE,
         sizes: {},
         goals: [],
         createdAt: new Date().toISOString(),
@@ -198,8 +168,6 @@ function AddProfileForm({ onDone }: { onDone: () => void }) {
           autoFocus
         />
       </div>
-
-      <RoleChips value={role} onChange={setRole} />
 
       <div className={[styles.profileExpandedActions, styles.profileExpandedActionsRight].join(' ')}>
         <button type="button" className={styles.profileCancelBtn} onClick={onDone}>Cancel</button>

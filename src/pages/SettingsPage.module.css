@@ -152,35 +152,6 @@
   text-overflow: ellipsis;
 }
 
-.profileItemRole {
-  font-size: 12px;
-  color: var(--c-text-muted);
-}
-
-/* Role chips */
-.profileRoleChips {
-  display: flex;
-  gap: 8px;
-  padding-left: 48px; /* align with name input (avatar width + gap) */
-}
-
-.roleChip {
-  padding: 5px 14px;
-  border-radius: 100px;
-  font-size: 13px;
-  border: 1px solid var(--c-border);
-  color: var(--c-text-muted);
-  transition: background 0.12s, border-color 0.12s, color 0.12s;
-  min-height: 32px;
-}
-.roleChip:hover  { border-color: var(--c-text-muted); color: var(--c-text); }
-.roleChip:active { opacity: 0.7; }
-.roleChipActive  {
-  background: var(--c-accent);
-  border-color: var(--c-accent);
-  color: #0A0A0A;
-}
-
 /* Actions row */
 .profileExpandedActions {
   display: flex;
