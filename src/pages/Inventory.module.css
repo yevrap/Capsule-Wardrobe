@@ -50,7 +50,8 @@
   border: 1px solid var(--c-border);
   border-radius: var(--r-md);
   padding: 10px 14px;
-  font-size: 14px;
+  /* 16px minimum — prevents iOS Safari from zooming on focus */
+  font-size: 16px;
   color: var(--c-text);
   outline: none;
   -webkit-appearance: none;

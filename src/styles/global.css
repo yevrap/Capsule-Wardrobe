@@ -55,6 +55,9 @@
 
 html {
   font-size: 16px;
+  /* Prevent the page itself from scrolling sideways.
+     Internally scrollable elements (filter rows, photo strips) are unaffected. */
+  overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
 }
@@ -66,7 +69,10 @@ body {
   font-size: 15px;
   line-height: 1.5;
   min-height: 100svh;
+  /* Prevent iOS rubber-band overscroll from showing the background behind the app */
   overscroll-behavior: none;
+  /* Keep body within viewport width */
+  max-width: 100%;
 }
 
 #root {
@@ -89,7 +95,12 @@ h3 { font-size: 1.05rem; font-weight: 500; letter-spacing: -0.01em; }
 
 /* ─── Base elements ──────────────────────────────────────────────────────────*/
 
-a { color: inherit; text-decoration: none; }
+a {
+  color: inherit;
+  text-decoration: none;
+  /* Prevent double-tap zoom on links (iOS) */
+  touch-action: manipulation;
+}
 
 img { display: block; max-width: 100%; }
 
@@ -101,11 +112,14 @@ button {
   background: none;
   color: inherit;
   -webkit-appearance: none;
+  /* Prevents the 300ms tap delay and double-tap-zoom on mobile */
+  touch-action: manipulation;
 }
 
 input, textarea, select {
   font-family: inherit;
-  font-size: 15px;
+  /* 16px minimum prevents iOS Safari from zooming in on input focus */
+  font-size: 16px;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: var(--r-sm);
@@ -125,9 +139,13 @@ input::placeholder, textarea::placeholder {
   color: var(--c-text-faint);
 }
 
+/* Suppress number input spinners */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; }
+input[type='number'] { -moz-appearance: textfield; }
+
 /* ─── Reusable component classes ─────────────────────────────────────────────*/
 
-/* Primary action button */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -139,16 +157,15 @@ input::placeholder, textarea::placeholder {
   font-weight: 500;
   letter-spacing: 0.01em;
   cursor: pointer;
+  touch-action: manipulation;
   transition: opacity 0.15s, background 0.15s;
   white-space: nowrap;
+  /* Minimum touch target height on mobile */
+  min-height: 44px;
 }
 
-.btn-primary {
-  background: var(--c-accent);
-  color: #0A0A0A;
-}
-
-.btn-primary:hover { opacity: 0.88; }
+.btn-primary { background: var(--c-accent); color: #0A0A0A; }
+.btn-primary:hover  { opacity: 0.88; }
 .btn-primary:active { opacity: 0.75; }
 
 .btn-ghost {
@@ -156,18 +173,10 @@ input::placeholder, textarea::placeholder {
   color: var(--c-text-muted);
   border: 1px solid var(--c-border);
 }
+.btn-ghost:hover { border-color: var(--c-text-muted); color: var(--c-text); }
 
-.btn-ghost:hover {
-  border-color: var(--c-text-muted);
-  color: var(--c-text);
-}
+.btn-danger { background: var(--c-danger); color: #fff; }
 
-.btn-danger {
-  background: var(--c-danger);
-  color: #fff;
-}
-
-/* Card surface */
 .card {
   background: var(--c-surface);
   border: 1px solid var(--c-border);
@@ -175,14 +184,8 @@ input::placeholder, textarea::placeholder {
   padding: 20px;
 }
 
-/* Divider */
-.divider {
-  height: 1px;
-  background: var(--c-border);
-  border: none;
-}
+.divider { height: 1px; background: var(--c-border); border: none; }
 
-/* Empty state container */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -193,17 +196,9 @@ input::placeholder, textarea::placeholder {
   text-align: center;
   color: var(--c-text-muted);
 }
+.empty-state h3 { color: var(--c-text); }
 
-.empty-state h3 {
-  color: var(--c-text);
-}
-
-/* Form field wrapper */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.field { display: flex; flex-direction: column; gap: 6px; }
 
 .field-label {
   font-size: 12px;
@@ -220,10 +215,10 @@ input::placeholder, textarea::placeholder {
   margin: 0 auto;
 }
 
-/* On wide screens the sidebar takes space — page shifts right */
 @media (min-width: 768px) {
   .page {
     padding: 32px 40px 40px;
     margin-left: var(--sidebar-w);
+    max-width: calc(var(--content-max) + var(--sidebar-w));
   }
 }

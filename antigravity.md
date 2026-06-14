@@ -89,6 +89,53 @@ Gap between list items: `12–16px`. Gap between sections: `32–40px`.
 
 ---
 
+## Mobile PWA lessons (from real device testing)
+
+### iOS horizontal scroll lock
+
+iOS Safari allows rubber-band horizontal scroll even when there's no horizontal
+content. Fix: `overflow-x: hidden` on `html`. This is distinct from the vertical
+scroll used by page content — `overflow-y` is unset so pages scroll normally.
+
+**Trap:** `overflow-x: hidden` on `html` clips children that extend beyond the
+viewport with negative margins. The "full-bleed inside a padded container" trick
+(`margin: 0 -20px; padding: 0 20px`) creates a wider-than-viewport element that
+gets clipped. Solution: structure full-bleed sections (like the photo strip on
+ItemDetail) without negative margins — give them their own padding context
+instead of fighting the parent's padding with negative margins.
+
+### iOS input zoom
+
+iOS Safari zooms in on `<input>`, `<textarea>`, and `<select>` elements when
+their `font-size` is less than 16px. This is a platform-level behavior, not a
+bug. All form elements must be `font-size: 16px` or larger. This is set globally
+in `global.css` and must not be overridden to a smaller size in component CSS.
+
+### iOS tap delay
+
+Without `touch-action: manipulation` on interactive elements, iOS adds a 300ms
+delay to distinguish single-taps from double-taps. Set it globally on `button`
+and `a` in `global.css`.
+
+### Android ZIP auto-open
+
+When sharing a file via the Web Share API with `type: 'application/zip'`,
+Android recognises the MIME type and immediately opens it with the file manager
+or a ZIP extractor — before the user can choose where to save it. This breaks
+the "save to Files / Drive" flow. The fix: use `type: 'application/octet-stream'`
+in the `File` constructor. Android treats it as a generic download and presents
+the native share sheet. iOS is unaffected by the MIME type change.
+
+### Touch target sizing
+
+Minimum interactive target: 44×44px (Apple HIG) or 48×48dp (Material). Any
+button smaller than this — especially overlaid UI like the photo remove button —
+is unreliable on mobile. The `removeBtn` in `PhotoUploader` is 36×36px (slightly
+below guideline but a workable compromise for an overlay that shares space with
+the image).
+
+---
+
 ## What not to do
 
 | Temptation                        | Why to resist it                                         |
@@ -101,6 +148,9 @@ Gap between list items: `12–16px`. Gap between sections: `32–40px`.
 | Skip `ownerId` on a new table     | Every user-owned record needs `ownerId`. Adding it later = migration + data loss risk. |
 | Use `Math.random()` for IDs       | Use `crypto.randomUUID()` via `generateId()`. Crypto IDs have collision guarantees; Math.random does not. |
 | Put business logic in components  | Scoring, filtering, and export logic belong in `src/utils/`. Components render; utilities compute. |
+| Use negative margins for full-bleed layout | When `overflow-x: hidden` is set on `html`, negative-margin children get clipped. Structure pages so full-width sections have their own padding instead. |
+| Font-size below 16px on inputs    | iOS Safari auto-zooms on focus for inputs smaller than 16px. The global 16px must not be overridden smaller. |
+| MIME type `application/zip` in Web Share | Android auto-opens the file with its unzipper. Use `application/octet-stream` for the share target. |
 
 ---
 
@@ -134,14 +184,18 @@ in `src/scoring/`. Never magic-number a weight inline.
 ## Export / import design (Phase 1)
 
 Per-profile export produces a ZIP containing:
+- `manifest.json` — version tag + counts (used for validation on import)
 - `profile.json` — profile record
 - `garments.json` — all garments (Blob references replaced with filenames)
-- `images/` — one folder per garment, files named `<photoId>-compressed.jpg` and
-  `<photoId>-thumbnail.jpg`
-- `outfits.json`, `wearlogs.json`
+- `images/<garmentId>/<photoId>-compressed.jpg`
+- `images/<garmentId>/<photoId>-thumbnail.jpg`
 
 Import reads the ZIP, reconstructs Blobs, and writes to Dexie. The profile `id`
 is preserved so re-importing doesn't create duplicates (upsert, not insert).
+
+The file shared on mobile uses MIME type `application/octet-stream` (not
+`application/zip`) to prevent Android from auto-extracting it. The `.zip`
+extension in the filename still tells iOS Files app and desktop OSes what it is.
 
 This format is also the migration path if sync is ever added — a sync backend
 can consume and produce the same ZIP schema.

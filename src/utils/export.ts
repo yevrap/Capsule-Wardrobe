@@ -122,7 +122,9 @@ export async function exportProfile(
 // ─── Cross-platform download / share ────────────────────────────────────────
 
 async function triggerDownload(blob: Blob, filename: string): Promise<void> {
-  const file = new File([blob], filename, { type: 'application/zip' });
+  // Use octet-stream (not application/zip) so Android doesn't auto-open the
+  // file with its unzipper / file manager before the user saves it.
+  const file = new File([blob], filename, { type: 'application/octet-stream' });
 
   // Web Share API with files — gives the native iOS/Android share sheet
   // (AirDrop, Files app, Drive, Messages…). Best mobile experience.

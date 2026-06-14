@@ -68,17 +68,17 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ✕ remove button, top-right corner of image */
+/* ✕ remove button, top-right corner of image — 36px min touch target on mobile */
 .removeBtn {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 24px;
-  height: 24px;
+  top: 4px;
+  right: 4px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(10, 10, 10, 0.75);
   color: var(--c-text);
-  font-size: 11px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;

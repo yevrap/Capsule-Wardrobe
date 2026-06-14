@@ -51,7 +51,7 @@ export function ItemDetail() {
   }
 
   return (
-    <div className="page">
+    <div className={styles.detail}>
       {/* ── Top bar ─────────────────────────────────────────────────────── */}
       <div className={styles.topBar}>
         <button className={styles.backBtn} onClick={() => navigate(-1)} type="button">← Back</button>
@@ -64,10 +64,11 @@ export function ItemDetail() {
         </button>
       </div>
 
+      {/* Full-width photo strip — naturally flush to edges, no negative margins */}
       <PhotoStrip photos={garment.photos} />
 
       {/* ── Metadata ────────────────────────────────────────────────────── */}
-      <div className={styles.meta}>
+      <div className={styles.content}>
         <h1 className={styles.name}>{garment.name}</h1>
         {garment.brand && <p className={styles.brand}>{garment.brand}</p>}
 
