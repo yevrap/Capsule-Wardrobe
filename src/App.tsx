@@ -11,6 +11,7 @@ import { AddOutfit } from '@/pages/AddOutfit';
 import { OutfitDetail } from '@/pages/OutfitDetail';
 import { EditOutfit } from '@/pages/EditOutfit';
 import { DataPage } from '@/pages/DataPage';
+import { UpdatePrompt } from '@/components/UpdatePrompt';
 
 // AppRoutes is a child of ProfileProvider so it can read profile state.
 function AppRoutes() {
@@ -56,6 +57,7 @@ export function App() {
     <HashRouter>
       <ProfileProvider>
         <AppRoutes />
+        <UpdatePrompt />
       </ProfileProvider>
     </HashRouter>
   );

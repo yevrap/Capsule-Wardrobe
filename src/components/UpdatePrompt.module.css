@@ -1,0 +1,73 @@
+.banner {
+  position: fixed;
+  /* Sits above the mobile bottom nav with a small gap */
+  bottom: calc(var(--nav-height) + var(--safe-bottom) + 10px);
+  left: 16px;
+  right: 16px;
+  z-index: 150;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: 12px 16px;
+
+  /* Subtle lift */
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* On desktop, float as a compact card above the sidebar's bottom edge */
+@media (min-width: 768px) {
+  .banner {
+    bottom: 24px;
+    left: calc(var(--sidebar-w) + 16px);
+    right: auto;
+    width: 320px;
+  }
+}
+
+.text {
+  flex: 1;
+  font-size: 14px;
+  color: var(--c-text);
+}
+
+.updateBtn {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0A0A0A;
+  background: var(--c-accent);
+  border-radius: var(--r-sm);
+  padding: 6px 16px;
+  min-height: 36px;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+
+.updateBtn:hover { opacity: 0.85; }
+
+.dismissBtn {
+  font-size: 13px;
+  color: var(--c-text-muted);
+  min-height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+  flex-shrink: 0;
+  touch-action: manipulation;
+}
+
+.dismissBtn:hover { color: var(--c-text); }
