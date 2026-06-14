@@ -48,6 +48,16 @@
 
 .welcomeFooter {
   padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.onboardingHint {
+  font-size: 13px;
+  color: var(--c-text-muted);
+  text-align: center;
+  line-height: 1.5;
 }
 
 /* ─── Profile setup step ─────────────────────────────────────────────────── */

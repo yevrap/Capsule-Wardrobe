@@ -2,83 +2,238 @@ import { useRef, useState, useEffect } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useProfiles } from '@/contexts/ProfileContext';
 import { db } from '@/db';
+import { generateId } from '@/utils/id';
 import { exportProfile, type ExportProgress } from '@/utils/export';
 import { previewImport, runImport, type ImportPreview, type ImportProgress } from '@/utils/import';
-import type { Profile } from '@/types';
+import type { Profile, ProfileRole } from '@/types';
 import styles from './SettingsPage.module.css';
 
-// ─── Profile editor ───────────────────────────────────────────────────────────
+// ─── Profile management ───────────────────────────────────────────────────────
 
 const ROLE_LABELS: Record<string, string> = { self: 'Me', partner: 'Partner', child: 'Child' };
+const ROLE_KEYS: ProfileRole[] = ['self', 'partner', 'child'];
 
-function ProfileEditor({ profile }: { profile: Profile }) {
+function RoleChips({
+  value,
+  onChange,
+}: {
+  value: ProfileRole;
+  onChange: (r: ProfileRole) => void;
+}) {
+  return (
+    <div className={styles.profileRoleChips}>
+      {ROLE_KEYS.map((r) => (
+        <button
+          key={r}
+          type="button"
+          className={[styles.roleChip, value === r ? styles.roleChipActive : ''].join(' ')}
+          onClick={() => onChange(r)}
+        >
+          {ROLE_LABELS[r]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ProfileEditor({
+  profile,
+  canDelete,
+}: {
+  profile: Profile;
+  canDelete: boolean;
+}) {
+  const { profiles, activeProfile, setActiveProfileId } = useProfiles();
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(profile.name);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [draftName, setDraftName] = useState(profile.name);
+  const [draftRole, setDraftRole] = useState<ProfileRole>(profile.role);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    if (!editing) setDraft(profile.name);
-  }, [profile.name, editing]);
+    if (!editing) {
+      setDraftName(profile.name);
+      setDraftRole(profile.role);
+      setConfirmDelete(false);
+    }
+  }, [profile.name, profile.role, editing]);
+
+  function cancel() {
+    setDraftName(profile.name);
+    setDraftRole(profile.role);
+    setConfirmDelete(false);
+    setEditing(false);
+  }
 
   async function save() {
-    const name = draft.trim();
+    const name = draftName.trim();
+    if (!name) return;
+    await db.profiles.update(profile.id, { name, role: draftRole });
     setEditing(false);
-    if (!name || name === profile.name) { setDraft(profile.name); return; }
-    await db.profiles.update(profile.id, { name });
   }
 
-  function onKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Enter') { e.preventDefault(); save(); }
-    if (e.key === 'Escape') { setDraft(profile.name); setEditing(false); }
+  async function handleDelete() {
+    // Switch active profile before deleting so the app never has a null activeProfile
+    if (activeProfile?.id === profile.id) {
+      const next = profiles.find((p) => p.id !== profile.id);
+      if (next) setActiveProfileId(next.id);
+    }
+    await db.profiles.delete(profile.id);
   }
 
-  return (
-    <div className={styles.profileItem}>
-      <div className={styles.profileItemAvatar}>
-        {profile.name.charAt(0).toUpperCase()}
-      </div>
+  const initial = profile.name.charAt(0).toUpperCase();
 
-      {editing ? (
-        <div className={styles.profileEditRow}>
+  if (editing) {
+    return (
+      <div className={styles.profileItemExpanded}>
+        <div className={styles.profileExpandedHeader}>
+          <div className={styles.profileItemAvatar}>{initial}</div>
           <input
-            ref={inputRef}
             className={styles.profileNameInput}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={onKeyDown}
-            onBlur={save}
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') { e.preventDefault(); save(); }
+              if (e.key === 'Escape') cancel();
+            }}
             onFocus={(e) => e.target.select()}
             maxLength={32}
             aria-label="Profile name"
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
-          <button type="button" className={styles.profileSaveBtn} onMouseDown={save}>
-            Save
-          </button>
         </div>
-      ) : (
-        <div className={styles.profileDisplayRow}>
-          <div className={styles.profileItemInfo}>
-            <span className={styles.profileItemName}>{profile.name}</span>
-            <span className={styles.profileItemRole}>{ROLE_LABELS[profile.role] ?? profile.role}</span>
+
+        <RoleChips value={draftRole} onChange={setDraftRole} />
+
+        <div className={styles.profileExpandedActions}>
+          <div className={styles.profileDeleteZone}>
+            {canDelete && !confirmDelete && (
+              <button type="button" className={styles.profileDeleteBtn} onClick={() => setConfirmDelete(true)}>
+                Delete profile
+              </button>
+            )}
+            {confirmDelete && (
+              <span className={styles.profileDeleteConfirm}>
+                Remove {profile.name}?{' '}
+                <button type="button" className={styles.profileDeleteConfirmBtn} onMouseDown={handleDelete}>
+                  Yes, delete
+                </button>
+              </span>
+            )}
           </div>
-          <button type="button" className={styles.profileRenameBtn} onClick={() => setEditing(true)}>
-            Rename
-          </button>
+          <div className={styles.profileSaveGroup}>
+            <button type="button" className={styles.profileCancelBtn} onClick={cancel}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className={styles.profileSaveBtn}
+              onMouseDown={save}
+              disabled={!draftName.trim()}
+            >
+              Save
+            </button>
+          </div>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.profileItem}>
+      <div className={styles.profileItemAvatar}>{initial}</div>
+      <div className={styles.profileDisplayRow}>
+        <div className={styles.profileItemInfo}>
+          <span className={styles.profileItemName}>{profile.name}</span>
+          <span className={styles.profileItemRole}>{ROLE_LABELS[profile.role] ?? profile.role}</span>
+        </div>
+        <button type="button" className={styles.profileRenameBtn} onClick={() => setEditing(true)}>
+          Edit
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AddProfileForm({ onDone }: { onDone: () => void }) {
+  const [name, setName] = useState('');
+  const [role, setRole] = useState<ProfileRole>('self');
+  const [saving, setSaving] = useState(false);
+
+  async function handleAdd() {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setSaving(true);
+    try {
+      await db.profiles.add({
+        id: generateId(),
+        name: trimmed,
+        role,
+        sizes: {},
+        goals: [],
+        createdAt: new Date().toISOString(),
+      });
+      onDone();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className={styles.profileItemExpanded}>
+      <div className={styles.profileExpandedHeader}>
+        <div className={[styles.profileItemAvatar, styles.profileItemAvatarNew].join(' ')}>+</div>
+        <input
+          className={styles.profileNameInput}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') { e.preventDefault(); handleAdd(); }
+            if (e.key === 'Escape') onDone();
+          }}
+          placeholder="Name"
+          maxLength={32}
+          aria-label="New profile name"
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
+        />
+      </div>
+
+      <RoleChips value={role} onChange={setRole} />
+
+      <div className={[styles.profileExpandedActions, styles.profileExpandedActionsRight].join(' ')}>
+        <button type="button" className={styles.profileCancelBtn} onClick={onDone}>Cancel</button>
+        <button
+          type="button"
+          className={styles.profileSaveBtn}
+          onMouseDown={handleAdd}
+          disabled={!name.trim() || saving}
+        >
+          Add
+        </button>
+      </div>
     </div>
   );
 }
 
 function ProfileSection() {
   const { profiles } = useProfiles();
+  const [isAdding, setIsAdding] = useState(false);
+
   return (
     <section className={styles.section}>
       <p className={styles.sectionLabel}>Profiles</p>
       <div className={styles.profileList}>
-        {profiles.map((p) => <ProfileEditor key={p.id} profile={p} />)}
+        {profiles.map((p) => (
+          <ProfileEditor key={p.id} profile={p} canDelete={profiles.length > 1} />
+        ))}
+        {isAdding ? (
+          <AddProfileForm onDone={() => setIsAdding(false)} />
+        ) : (
+          <button type="button" className={styles.addProfileBtn} onClick={() => setIsAdding(true)}>
+            + Add profile
+          </button>
+        )}
       </div>
     </section>
   );
