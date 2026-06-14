@@ -1,11 +1,11 @@
 /* ─── Bottom nav (mobile) ────────────────────────────────────────────────── */
 
+/* No longer position:fixed — lives in the document flow as the last flex child
+   of the Layout shell. This prevents it overlapping content and keeps it stable
+   when the keyboard opens. */
 .bottomNav {
   display: flex;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
   height: calc(var(--nav-height) + var(--safe-bottom));
   padding-bottom: var(--safe-bottom);
   background: var(--c-surface);
@@ -31,27 +31,29 @@
 .tabIcon  { font-size: 20px; line-height: 1; }
 .tabLabel { font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
 
-/* ─── Sidebar (desktop / tablet) ─────────────────────────────────────────── */
+/* ─── Sidebar (desktop) ──────────────────────────────────────────────────── */
 
 .sidebar {
-  display: none; /* hidden on mobile */
+  display: none;
 }
 
 @media (min-width: 768px) {
   .bottomNav { display: none; }
 
+  /* Sidebar lives in the flex row alongside <main>.
+     order:-1 places it before main even though it's after in the DOM. */
   .sidebar {
     display: flex;
     flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
+    order: -1;
+    flex-shrink: 0;
     width: var(--sidebar-w);
+    height: 100%;
     background: var(--c-surface);
     border-right: 1px solid var(--c-border);
     padding: 28px 16px 24px;
     gap: 4px;
+    overflow-y: auto;
     z-index: 100;
   }
 }
@@ -83,7 +85,7 @@
   font-weight: 400;
   text-decoration: none;
   transition: background 0.12s, color 0.12s;
-  position: relative; /* required for ::before active indicator */
+  position: relative;
 }
 
 .sidebarLink:hover       { background: var(--c-surface-2); color: var(--c-text); }

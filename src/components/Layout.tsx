@@ -1,17 +1,21 @@
 import { type ReactNode } from 'react';
 import { Nav } from './Nav';
+import styles from './Layout.module.css';
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-// Layout wraps every authenticated page with the persistent Nav.
-// Pages use the `.page` class from global.css for their own padding.
+// Main content appears before Nav in the DOM.
+// On mobile (flex-column): content fills available height, Nav sits at the bottom.
+// On desktop (flex-row): Nav renders the sidebar with order:-1 so it appears left of content.
 export function Layout({ children }: LayoutProps) {
   return (
-    <>
+    <div className={styles.shell}>
+      <main className={styles.content}>
+        {children}
+      </main>
       <Nav />
-      <main>{children}</main>
-    </>
+    </div>
   );
 }

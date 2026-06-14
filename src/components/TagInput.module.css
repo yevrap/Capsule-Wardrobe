@@ -45,7 +45,8 @@
   background: transparent;
   border: none;
   padding: 0;
-  font-size: 14px;
+  /* 16px minimum — prevents iOS Safari from zooming on focus */
+  font-size: 16px;
   color: var(--c-text);
   outline: none;
 }

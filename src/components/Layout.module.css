@@ -1,0 +1,28 @@
+/* The shell fills the full viewport and does not scroll.
+   On mobile:  flex column — content on top, bottom nav at the bottom.
+   On desktop: flex row  — sidebar on the left, content on the right.
+   This is the correct architecture for a PWA: the OS never scrolls the page,
+   only the inner content area scrolls. This keeps the keyboard, safe areas,
+   and navigation stable. */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100svh; /* stable: doesn't change as browser chrome shows/hides */
+  overflow: hidden;
+  background: var(--c-bg);
+}
+
+/* The only scrollable surface in the app. */
+.content {
+  flex: 1;
+  min-height: 0; /* critical: lets flex child shrink below its content size */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+@media (min-width: 768px) {
+  .shell { flex-direction: row; }
+}

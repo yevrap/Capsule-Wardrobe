@@ -4,18 +4,18 @@
    ─────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Backgrounds — near-black editorial palette */
-  --c-bg:        #0A0A0A;  /* page background */
-  --c-surface:   #141414;  /* cards, inputs */
-  --c-surface-2: #1E1E1E;  /* hover states, nested surfaces */
-  --c-border:    #2A2A2A;  /* dividers, input borders */
+  /* Backgrounds */
+  --c-bg:        #0A0A0A;
+  --c-surface:   #141414;
+  --c-surface-2: #1E1E1E;
+  --c-border:    #2A2A2A;
 
   /* Text */
-  --c-text:       #F0EDE8;  /* primary — warm white */
-  --c-text-muted: #6B6B6B;  /* secondary labels */
-  --c-text-faint: #3A3A3A;  /* placeholder, disabled */
+  --c-text:       #F0EDE8;
+  --c-text-muted: #6B6B6B;
+  --c-text-faint: #3A3A3A;
 
-  /* Accent — warm cream/gold (editorial, not loud) */
+  /* Accent */
   --c-accent:     #C8B89A;
   --c-accent-dim: #8B7355;
 
@@ -34,9 +34,9 @@
   --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Layout */
-  --nav-height:   64px;
-  --sidebar-w:    220px;
-  --content-max:  960px;
+  --nav-height:  64px;
+  --sidebar-w:   220px;
+  --content-max: 960px;
 
   /* Safe areas (iOS notch / home indicator) */
   --safe-top:    env(safe-area-inset-top,    0px);
@@ -53,33 +53,34 @@
   padding: 0;
 }
 
+/* html and body fill the viewport but do not scroll themselves.
+   Scrolling happens inside the Layout shell's <main> element.
+   This locks the page against horizontal rubber-band on iOS and
+   prevents the bottom nav from being pushed out of view by the keyboard. */
 html {
+  height: 100%;
   font-size: 16px;
-  /* Prevent the page itself from scrolling sideways.
-     Internally scrollable elements (filter rows, photo strips) are unaffected. */
-  overflow-x: hidden;
+  overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
+  height: 100%;
   background-color: var(--c-bg);
   color: var(--c-text);
   font-family: var(--font);
   font-size: 15px;
   line-height: 1.5;
-  min-height: 100svh;
-  /* Prevent iOS rubber-band overscroll from showing the background behind the app */
+  overflow: hidden;
   overscroll-behavior: none;
-  /* Keep body within viewport width */
-  max-width: 100%;
 }
 
 #root {
-  min-height: 100svh;
+  height: 100%;
 }
 
-/* ─── Typography scale ───────────────────────────────────────────────────────*/
+/* ─── Typography ─────────────────────────────────────────────────────────────*/
 
 h1 { font-size: 2rem;    font-weight: 300; letter-spacing: -0.03em; line-height: 1.1; }
 h2 { font-size: 1.35rem; font-weight: 400; letter-spacing: -0.02em; }
@@ -98,7 +99,6 @@ h3 { font-size: 1.05rem; font-weight: 500; letter-spacing: -0.01em; }
 a {
   color: inherit;
   text-decoration: none;
-  /* Prevent double-tap zoom on links (iOS) */
   touch-action: manipulation;
 }
 
@@ -112,13 +112,14 @@ button {
   background: none;
   color: inherit;
   -webkit-appearance: none;
-  /* Prevents the 300ms tap delay and double-tap-zoom on mobile */
+  /* Prevents 300ms tap delay and double-tap-zoom on mobile */
   touch-action: manipulation;
 }
 
+/* 16px minimum across all inputs — prevents iOS Safari auto-zoom on focus.
+   This must not be overridden to anything smaller in component CSS. */
 input, textarea, select {
   font-family: inherit;
-  /* 16px minimum prevents iOS Safari from zooming in on input focus */
   font-size: 16px;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
@@ -139,7 +140,7 @@ input::placeholder, textarea::placeholder {
   color: var(--c-text-faint);
 }
 
-/* Suppress number input spinners */
+/* Suppress number spinners */
 input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; }
 input[type='number'] { -moz-appearance: textfield; }
@@ -160,7 +161,6 @@ input[type='number'] { -moz-appearance: textfield; }
   touch-action: manipulation;
   transition: opacity 0.15s, background 0.15s;
   white-space: nowrap;
-  /* Minimum touch target height on mobile */
   min-height: 44px;
 }
 
@@ -208,17 +208,18 @@ input[type='number'] { -moz-appearance: textfield; }
   color: var(--c-text-muted);
 }
 
-/* Scrollable page content (accounts for bottom nav on mobile) */
+/* Page padding — used by most page-level containers.
+   No bottom padding for nav height: the nav is in the document flow (not fixed),
+   so it naturally sits below the page content.
+   Only the safe-area bottom is added so content doesn't hide behind the home indicator. */
 .page {
-  padding: 24px 20px calc(var(--nav-height) + var(--safe-bottom) + 24px);
+  padding: 24px 20px calc(var(--safe-bottom) + 24px);
   max-width: var(--content-max);
   margin: 0 auto;
 }
 
 @media (min-width: 768px) {
   .page {
-    padding: 32px 40px 40px;
-    margin-left: var(--sidebar-w);
-    max-width: calc(var(--content-max) + var(--sidebar-w));
+    padding: 32px 40px calc(var(--safe-bottom) + 40px);
   }
 }

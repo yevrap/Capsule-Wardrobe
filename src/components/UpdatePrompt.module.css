@@ -1,6 +1,8 @@
 .banner {
   position: fixed;
-  /* Sits above the mobile bottom nav with a small gap */
+  /* Sits above the bottom nav.
+     The nav is in the document flow (not fixed), but the banner is fixed
+     to the viewport — so we still offset by nav height + safe area. */
   bottom: calc(var(--nav-height) + var(--safe-bottom) + 10px);
   left: 16px;
   right: 16px;

@@ -1,6 +1,13 @@
-/* Full-screen layout shared by all onboarding steps */
+/* Full-screen layout shared by all onboarding steps.
+   Onboarding renders outside the Layout shell, so it owns its own scroll.
+   height: 100svh + overflow-y: auto means it fills the screen and scrolls
+   internally if content is taller (e.g., the profile setup step with 3 profiles). */
 .screen {
-  min-height: 100svh;
+  height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   display: flex;
   flex-direction: column;
   padding: 0 24px calc(40px + var(--safe-bottom));
