@@ -1,0 +1,87 @@
+.backBtn {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  margin-bottom: 24px;
+  display: block;
+  transition: color 0.15s;
+}
+
+.backBtn:hover { color: var(--c-text); }
+
+/* Horizontal scrollable photo strip */
+.photoStrip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -20px 28px;
+  padding: 0 20px;
+  scrollbar-width: none;
+}
+
+.photoStrip::-webkit-scrollbar { display: none; }
+
+.photo {
+  flex-shrink: 0;
+  width: min(80vw, 340px);
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--r-lg);
+  scroll-snap-align: start;
+  background: var(--c-surface);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 540px;
+}
+
+.name {
+  font-size: 1.8rem;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+}
+
+.brand {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  margin-top: -6px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+  text-transform: capitalize;
+}
+
+.price {
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: var(--c-accent);
+}
+
+.notes {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  line-height: 1.6;
+}
+
+.buyLink {
+  font-size: 13px;
+  color: var(--c-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

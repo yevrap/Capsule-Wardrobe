@@ -1,8 +1,51 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db';
 import { useProfiles } from '@/contexts/ProfileContext';
+import { blobToUrl } from '@/utils/image';
+import type { Garment } from '@/types';
 import styles from './Inventory.module.css';
+
+// Converts the first thumbnail Blob of a garment to an object URL.
+// Returns null while loading or if the garment has no photos.
+function useGarmentThumb(garment: Garment): string | null {
+  const [url, setUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const thumb = garment.photos[0]?.thumbnail;
+    if (!thumb) { setUrl(null); return; }
+    const objectUrl = blobToUrl(thumb);
+    setUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [garment.photos]);
+
+  return url;
+}
+
+function GarmentCard({ garment }: { garment: Garment }) {
+  const navigate = useNavigate();
+  const thumbUrl = useGarmentThumb(garment);
+
+  return (
+    <button
+      className={styles.gridItem}
+      onClick={() => navigate(`/item/${garment.id}`)}
+      type="button"
+      aria-label={garment.name}
+    >
+      <div className={styles.gridThumb}>
+        {thumbUrl ? (
+          <img src={thumbUrl} alt={garment.name} className={styles.gridThumbImg} />
+        ) : (
+          <span className={styles.gridThumbPlaceholder} aria-hidden="true">◈</span>
+        )}
+      </div>
+      <p className={styles.gridName}>{garment.name}</p>
+      {garment.brand && <p className={styles.gridBrand}>{garment.brand}</p>}
+    </button>
+  );
+}
 
 export function Inventory() {
   const navigate = useNavigate();
@@ -11,7 +54,11 @@ export function Inventory() {
   const garments = useLiveQuery(
     () =>
       activeProfile
-        ? db.garments.where('ownerId').equals(activeProfile.id).toArray()
+        ? db.garments
+            .where('ownerId')
+            .equals(activeProfile.id)
+            .reverse()
+            .sortBy('createdAt')
         : [],
     [activeProfile?.id],
   );
@@ -27,17 +74,19 @@ export function Inventory() {
           <h1 className={styles.profileName}>{activeProfile?.name ?? '—'}</h1>
         </div>
 
-        {/* Profile switcher (mobile — sidebar handles desktop) */}
+        {/* Profile switcher pill row — mobile only (sidebar handles desktop) */}
         {profiles.length > 1 && (
           <div className={styles.profilePills}>
             {profiles.map((p) => (
               <button
                 key={p.id}
+                type="button"
                 className={[
                   styles.profilePill,
                   activeProfile?.id === p.id ? styles.profilePillActive : '',
                 ].join(' ')}
                 onClick={() => setActiveProfileId(p.id)}
+                aria-label={`Switch to ${p.name}`}
               >
                 {p.name.charAt(0).toUpperCase()}
               </button>
@@ -53,6 +102,7 @@ export function Inventory() {
           <h3>No items yet</h3>
           <p>Add your first garment to start building your wardrobe.</p>
           <button
+            type="button"
             className="btn btn-primary"
             style={{ marginTop: 8 }}
             onClick={() => navigate('/add')}
@@ -62,14 +112,21 @@ export function Inventory() {
         </div>
       ) : (
         <>
-          <p className={styles.count}>{count} {count === 1 ? 'item' : 'items'}</p>
-          {/* Phase 1: garment grid goes here */}
+          <div className={styles.toolbar}>
+            <p className={styles.count}>{count} {count === 1 ? 'item' : 'items'}</p>
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{ padding: '8px 18px', fontSize: 13 }}
+              onClick={() => navigate('/add')}
+            >
+              + Add
+            </button>
+          </div>
+
           <div className={styles.grid}>
             {garments?.map((g) => (
-              <div key={g.id} className={styles.gridItem}>
-                <div className={styles.gridThumb} aria-label={g.name} />
-                <p className={styles.gridName}>{g.name}</p>
-              </div>
+              <GarmentCard key={g.id} garment={g} />
             ))}
           </div>
         </>

@@ -1,12 +1,112 @@
 .header {
-  margin-bottom: 40px;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 32px;
 }
+
+.backBtn {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.backBtn:hover { color: var(--c-text); }
 
 .header h1 {
-  margin-top: 4px;
+  font-size: 1.8rem;
+  font-weight: 200;
 }
 
-.icon {
-  font-size: 2.5rem;
-  color: var(--c-text-faint);
+/* Form layout */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 640px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+/* Field */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.required {
+  color: var(--c-accent);
+}
+
+.fieldError {
+  font-size: 12px;
+  color: var(--c-danger);
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--c-text-muted);
+}
+
+/* Category chips */
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.categoryChip {
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 400;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.categoryChip:hover {
+  border-color: var(--c-text-muted);
+  color: var(--c-text);
+}
+
+.categoryChipActive {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #0A0A0A;
+}
+
+/* Two-column layout for small paired fields */
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.saveRow {
+  padding-bottom: 8px;
 }

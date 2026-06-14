@@ -1,0 +1,148 @@
+.uploader {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+/* Photo grid — 2 cols on mobile, 3 on wider screens */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 480px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 768px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+
+/* Individual photo slot */
+.slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.slotImg {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--r-md);
+  background: var(--c-surface-2);
+  display: block;
+}
+
+/* Processing spinner overlay */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 28px; /* leave room for tag row */
+  border-radius: var(--r-md);
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlayError {
+  composes: overlay;
+  background: rgba(224, 83, 83, 0.4);
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+/* CSS-only spinner ring */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ✕ remove button, top-right corner of image */
+.removeBtn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(10, 10, 10, 0.75);
+  color: var(--c-text);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.15s;
+}
+
+.removeBtn:hover { background: var(--c-danger); }
+
+/* Tag chips row */
+.tagRow {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tagChip {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 3px 7px;
+  border-radius: 100px;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  text-transform: lowercase;
+}
+
+.tagChip:hover { border-color: var(--c-text-muted); color: var(--c-text); }
+
+.tagChipActive {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #0A0A0A;
+}
+
+/* Add / Add more button */
+.addBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 20px;
+  border: 1px dashed var(--c-border);
+  border-radius: var(--r-lg);
+  color: var(--c-text-muted);
+  font-size: 15px;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.addBtn:hover {
+  border-color: var(--c-accent-dim);
+  color: var(--c-text);
+  background: var(--c-surface);
+}
+
+.addBtnCompact {
+  padding: 12px;
+  font-size: 13px;
+}
+
+.addIcon {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--c-accent);
+}

@@ -2,7 +2,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   gap: 16px;
 }
 
@@ -13,15 +13,13 @@
   margin-top: 4px;
 }
 
-/* Mobile-only profile switcher (avatars in a row) */
 .profilePills {
   display: flex;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 @media (min-width: 768px) {
-  /* Sidebar handles switching on desktop */
   .profilePills { display: none; }
 }
 
@@ -45,27 +43,37 @@
   color: var(--c-text-faint);
 }
 
-.count {
-  font-size: 13px;
-  color: var(--c-text-muted);
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
 
-/* 2-col on phone, 3-col on tablet, 4-col on desktop */
+.count {
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+/* 2-col phone → 3-col tablet → 4-col desktop */
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
-@media (min-width: 540px)  { .grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 900px)  { .grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 540px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 900px) { .grid { grid-template-columns: repeat(4, 1fr); } }
 
 .gridItem {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  text-align: left;
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .gridThumb {
@@ -73,12 +81,40 @@
   border-radius: var(--r-md);
   background: var(--c-surface);
   border: 1px solid var(--c-border);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+}
+
+.gridItem:hover .gridThumb { border-color: var(--c-text-muted); }
+
+.gridThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gridThumbPlaceholder {
+  font-size: 2rem;
+  color: var(--c-text-faint);
 }
 
 .gridName {
   font-size: 13px;
+  color: var(--c-text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gridBrand {
+  font-size: 11px;
   color: var(--c-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: -4px;
 }
