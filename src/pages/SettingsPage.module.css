@@ -1,0 +1,347 @@
+.header {
+  margin-bottom: 32px;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 200;
+  margin-top: 4px;
+}
+
+/* Profile selector chips */
+.profileRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 20px 0;
+}
+
+.profileChip {
+  padding: 7px 18px;
+  border-radius: 100px;
+  font-size: 14px;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.profileChip:hover { border-color: var(--c-text-muted); color: var(--c-text); }
+.profileChipActive {
+  background: var(--c-surface-2);
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+/* Sections */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px 0;
+}
+
+.sectionLabel {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.sectionSub {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  line-height: 1.6;
+  max-width: 480px;
+  margin-top: -4px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--c-border);
+}
+
+/* Action buttons — full width on mobile, auto on wider screens */
+.actionBtn {
+  width: 100%;
+  padding: 16px;
+  font-size: 15px;
+}
+
+@media (min-width: 480px) {
+  .actionBtn {
+    width: auto;
+    align-self: flex-start;
+    padding: 12px 28px;
+  }
+}
+
+/* ─── Profile editor ─────────────────────────────────────────────────────── */
+
+.profileList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profileItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--c-border);
+}
+.profileItem:last-child { border-bottom: none; }
+
+.profileItemAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-accent);
+  flex-shrink: 0;
+}
+
+.profileDisplayRow {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 12px;
+}
+
+.profileItemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.profileItemName {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--c-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileItemRole {
+  font-size: 12px;
+  color: var(--c-text-muted);
+}
+
+.profileRenameBtn {
+  font-size: 13px;
+  color: var(--c-accent);
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+.profileRenameBtn:hover  { opacity: 0.75; }
+.profileRenameBtn:active { opacity: 0.5; }
+
+.profileEditRow {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.profileNameInput {
+  flex: 1;
+  min-width: 0;
+  /* Inherits 16px font-size from global input rule — must stay ≥ 16px */
+  padding: 8px 12px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-accent-dim);
+  border-radius: var(--r-sm);
+  color: var(--c-text);
+}
+
+.profileSaveBtn {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--c-accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s;
+}
+.profileSaveBtn:hover  { opacity: 0.75; }
+.profileSaveBtn:active { opacity: 0.5; }
+
+/* ─── Update / version card ──────────────────────────────────────────────── */
+
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 480px;
+}
+
+.versionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.appName {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+}
+
+.versionMeta {
+  font-size: 13px;
+  color: var(--c-text-muted);
+  margin-top: 3px;
+}
+
+.updateBadge {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--c-success);
+  background: color-mix(in srgb, var(--c-success) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c-success) 30%, transparent);
+  border-radius: 100px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.updateBtn {
+  align-self: flex-start;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.upToDate {
+  font-size: 13px;
+  color: var(--c-success);
+}
+
+.reloadLink {
+  font-size: 13px;
+  color: var(--c-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  align-self: flex-start;
+  transition: color 0.15s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.reloadLink:hover { color: var(--c-text); }
+
+/* ─── Progress / status ──────────────────────────────────────────────────── */
+
+.progressArea {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressBar {
+  height: 3px;
+  background: var(--c-surface-2);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--c-accent);
+  border-radius: 100px;
+  transition: width 0.3s ease;
+  min-width: 4px;
+}
+
+.progressLabel {
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.successMsg {
+  font-size: 14px;
+  color: var(--c-success);
+}
+
+.errorMsg {
+  font-size: 13px;
+  color: var(--c-danger);
+  line-height: 1.5;
+}
+
+/* ─── Import preview ─────────────────────────────────────────────────────── */
+
+.previewCard {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 420px;
+}
+
+.previewMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.previewName {
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.previewDetail {
+  font-size: 13px;
+  color: var(--c-text-muted);
+}
+
+.mergeNote {
+  font-size: 12px;
+  color: var(--c-warning);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.previewActions {
+  display: flex;
+  gap: 10px;
+}
+
+.successCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}

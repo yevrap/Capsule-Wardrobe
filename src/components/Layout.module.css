@@ -25,6 +25,8 @@
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  /* Breathing room above a focused input when the browser scrolls it into view */
+  scroll-padding-top: 16px;
 }
 
 @media (min-width: 768px) {

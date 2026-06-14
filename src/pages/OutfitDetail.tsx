@@ -42,7 +42,14 @@ export function OutfitDetail() {
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const outfit = useLiveQuery(() => (id ? db.outfits.get(id) : undefined), [id]);
+  // Returns undefined (loading) | null (not found) | Outfit (found).
+  const outfit = useLiveQuery(
+    async () => {
+      if (!id) return null;
+      return (await db.outfits.get(id)) ?? null;
+    },
+    [id],
+  );
 
   const garments = useLiveQuery(
     async () => {
@@ -53,13 +60,18 @@ export function OutfitDetail() {
     [outfit?.garmentIds.join(',')],
   );
 
-  if (outfit === undefined) return null;
-
-  if (!outfit) {
+  // Always show the frame with a back button — never a blank screen.
+  if (outfit === undefined || !outfit) {
     return (
       <div className="page">
-        <button type="button" className={styles.backBtn} onClick={() => navigate(-1)}>← Back</button>
-        <div className="empty-state"><h3>Outfit not found</h3></div>
+        <div className={styles.topBar}>
+          <button type="button" className={styles.backBtn} onClick={() => navigate(-1)}>
+            ← Back
+          </button>
+        </div>
+        {outfit === null && (
+          <div className="empty-state"><h3>Outfit not found</h3></div>
+        )}
       </div>
     );
   }

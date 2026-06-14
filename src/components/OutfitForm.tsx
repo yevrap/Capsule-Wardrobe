@@ -130,8 +130,6 @@ export function OutfitForm({ initial, onSave, onCancel, saveLabel = 'Save outfit
           placeholder="e.g. Friday casual"
           value={values.name}
           onChange={(e) => setValues((v) => ({ ...v, name: e.target.value }))}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
         />
       </div>
 

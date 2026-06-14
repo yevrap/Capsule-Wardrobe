@@ -13,7 +13,8 @@
   display: flex;
   align-items: center;
 }
-.backBtn:hover { color: var(--c-text); }
+.backBtn:hover  { color: var(--c-text); }
+.backBtn:active { opacity: 0.6; }
 
 .editBtn {
   font-size: 14px;
@@ -24,7 +25,8 @@
   display: flex;
   align-items: center;
 }
-.editBtn:hover { opacity: 0.75; }
+.editBtn:hover  { opacity: 0.75; }
+.editBtn:active { opacity: 0.5; }
 
 /* Header */
 .header {
@@ -90,7 +92,8 @@
   transition: border-color 0.15s;
 }
 
-.tile:hover .tileThumb { border-color: var(--c-text-muted); }
+.tile:hover  .tileThumb { border-color: var(--c-text-muted); }
+.tile:active .tileThumb { opacity: 0.75; }
 
 .tileImg { width: 100%; height: 100%; object-fit: cover; }
 .tilePlaceholder { font-size: 1.8rem; color: var(--c-text-faint); }
@@ -131,7 +134,8 @@
   padding: 16px 0;
   min-height: 44px;
 }
-.deleteBtn:hover { color: var(--c-danger); }
+.deleteBtn:hover  { color: var(--c-danger); }
+.deleteBtn:active { color: var(--c-danger); opacity: 0.7; }
 
 .confirmRow {
   display: flex;

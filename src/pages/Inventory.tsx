@@ -104,6 +104,10 @@ export function Inventory() {
               value={filter.search}
               onChange={(e) => setFilter((f) => ({ ...f, search: e.target.value }))}
               aria-label="Search wardrobe"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="none"
+              spellCheck={false}
             />
             {activeFilterCount > 0 && (
               <button type="button" className={styles.clearBtn} onClick={clearAll}>

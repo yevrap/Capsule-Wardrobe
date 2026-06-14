@@ -145,6 +145,20 @@ input[type='number']::-webkit-inner-spin-button,
 input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; }
 input[type='number'] { -moz-appearance: textfield; }
 
+/* Safari applies its own UA font-size to search fields which can bypass the 16px
+   rule and trigger iOS auto-zoom. Strip all native search chrome explicitly. */
+input[type='search'] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-results-button,
+input[type='search']::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  display: none;
+}
+
 /* ─── Reusable component classes ─────────────────────────────────────────────*/
 
 .btn {
@@ -173,9 +187,12 @@ input[type='number'] { -moz-appearance: textfield; }
   color: var(--c-text-muted);
   border: 1px solid var(--c-border);
 }
-.btn-ghost:hover { border-color: var(--c-text-muted); color: var(--c-text); }
+.btn-ghost:hover  { border-color: var(--c-text-muted); color: var(--c-text); }
+.btn-ghost:active { background: var(--c-surface-2); border-color: var(--c-text-muted); color: var(--c-text); }
 
-.btn-danger { background: var(--c-danger); color: #fff; }
+.btn-danger        { background: var(--c-danger); color: #fff; }
+.btn-danger:hover  { opacity: 0.9; }
+.btn-danger:active { opacity: 0.75; }
 
 .card {
   background: var(--c-surface);
@@ -208,14 +225,25 @@ input[type='number'] { -moz-appearance: textfield; }
   color: var(--c-text-muted);
 }
 
-/* Page padding — used by most page-level containers.
-   No bottom padding for nav height: the nav is in the document flow and sits
-   below the scroll container, so it never overlaps content.
-   No safe-bottom padding either: the nav bar already handles that internally. */
+/* Keyboard focus ring for accessibility — shown only for keyboard/sequential nav,
+   not for mouse or touch (which use :active states instead). */
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+/* Page padding + subtle enter animation.
+   Nav is in document flow so no nav-height or safe-bottom offset needed. */
 .page {
   padding: 24px 20px 24px;
   max-width: var(--content-max);
   margin: 0 auto;
+  animation: page-enter 0.15s ease-out both;
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @media (min-width: 768px) {

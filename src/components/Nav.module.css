@@ -26,6 +26,7 @@
 }
 
 .tab:hover  { color: var(--c-text); }
+.tab:active { opacity: 0.6; }
 .tabActive  { color: var(--c-accent) !important; }
 
 .tabIcon  { font-size: 20px; line-height: 1; }
@@ -89,6 +90,7 @@
 }
 
 .sidebarLink:hover       { background: var(--c-surface-2); color: var(--c-text); }
+.sidebarLink:active      { background: var(--c-border); }
 .sidebarLinkActive       { background: var(--c-surface-2); color: var(--c-text) !important; }
 .sidebarLinkActive::before {
   content: '';

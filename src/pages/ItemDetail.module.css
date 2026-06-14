@@ -2,6 +2,12 @@
   padding-bottom: 24px;
   max-width: var(--content-max);
   margin: 0 auto;
+  animation: page-enter 0.15s ease-out both;
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .topBar {
@@ -23,7 +29,8 @@
   display: flex;
   align-items: center;
 }
-.backBtn:hover { color: var(--c-text); }
+.backBtn:hover  { color: var(--c-text); }
+.backBtn:active { opacity: 0.6; }
 
 .editBtn {
   font-size: 14px;
@@ -34,7 +41,8 @@
   display: flex;
   align-items: center;
 }
-.editBtn:hover { opacity: 0.75; }
+.editBtn:hover  { opacity: 0.75; }
+.editBtn:active { opacity: 0.5; }
 
 /* Scrollable photo strip — padding only, no negative margins */
 .photoStrip {
@@ -125,7 +133,8 @@
   padding: 16px 0;
   min-height: 44px;
 }
-.deleteBtn:hover { color: var(--c-danger); }
+.deleteBtn:hover  { color: var(--c-danger); }
+.deleteBtn:active { color: var(--c-danger); opacity: 0.7; }
 
 .confirmRow { display: flex; flex-direction: column; gap: 16px; padding: 16px 0; }
 .confirmText { font-size: 14px; color: var(--c-text); }

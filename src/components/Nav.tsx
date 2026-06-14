@@ -6,7 +6,7 @@ const NAV_ITEMS = [
   { to: '/inventory', icon: '▤', label: 'Wardrobe' },
   { to: '/add',       icon: '+', label: 'Add' },
   { to: '/outfits',   icon: '◈', label: 'Outfits' },
-  { to: '/data',      icon: '⊙', label: 'Backup' },
+  { to: '/settings',  icon: '⚙', label: 'Settings' },
 ] as const;
 
 export function Nav() {

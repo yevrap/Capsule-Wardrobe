@@ -31,15 +31,29 @@ export function ItemDetail() {
   const navigate = useNavigate();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const garment = useLiveQuery(() => (id ? db.garments.get(id) : undefined), [id]);
+  // Returns undefined (loading) | null (not found) | Garment (found).
+  // Mapping the DB's undefined-when-not-found to null lets us distinguish
+  // "still loading" from "loaded but missing", so we never blank the page.
+  const garment = useLiveQuery(
+    async () => {
+      if (!id) return null;
+      return (await db.garments.get(id)) ?? null;
+    },
+    [id],
+  );
 
-  if (garment === undefined) return null;
-
-  if (!garment) {
+  // Always show the frame with the back button — never a blank screen.
+  if (garment === undefined || !garment) {
     return (
-      <div className="page">
-        <button className={styles.backBtn} onClick={() => navigate(-1)} type="button">← Back</button>
-        <div className="empty-state"><h3>Item not found</h3></div>
+      <div className={styles.detail}>
+        <div className={styles.topBar}>
+          <button className={styles.backBtn} onClick={() => navigate(-1)} type="button">
+            ← Back
+          </button>
+        </div>
+        {garment === null && (
+          <div className="empty-state"><h3>Item not found</h3></div>
+        )}
       </div>
     );
   }
