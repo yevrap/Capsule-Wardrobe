@@ -243,9 +243,6 @@ export function JournalPage() {
         </button>
       </header>
 
-      {/* ── Profile switcher ───────────────────────────────────────────── */}
-      <ProfileSwitcher />
-
       {/* ── Tab row ────────────────────────────────────────────────────── */}
       <div className={styles.tabRow}>
         <button
@@ -282,6 +279,8 @@ export function JournalPage() {
           </button>
         </div>
       </div>
+
+      <ProfileSwitcher />
 
       {/* ── Feed or calendar ────────────────────────────────────────────── */}
       {calView ? (
