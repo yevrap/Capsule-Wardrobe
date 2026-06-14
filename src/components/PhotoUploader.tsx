@@ -1,13 +1,11 @@
-import { useRef, useState, useLayoutEffect } from 'react';
+import { useRef, useState, useLayoutEffect, useEffect } from 'react';
 import type { GarmentPhoto, PhotoTag } from '@/types';
 import { generateId } from '@/utils/id';
-import { compressOriginal, generateThumbnail } from '@/utils/image';
+import { compressOriginal, generateThumbnail, blobToUrl } from '@/utils/image';
 import styles from './PhotoUploader.module.css';
 
 const PHOTO_TAGS: PhotoTag[] = ['front', 'back', 'tag', 'detail'];
 
-// Default tag for the Nth photo added (cycles through front/back/tag/detail,
-// then falls back to 'detail' for any extras).
 function defaultTag(index: number): PhotoTag {
   return PHOTO_TAGS[Math.min(index, PHOTO_TAGS.length - 1)];
 }
@@ -15,25 +13,47 @@ function defaultTag(index: number): PhotoTag {
 interface Slot {
   id: string;
   tag: PhotoTag;
-  previewUrl: string; // object URL for instant display before compression
+  previewUrl: string;
   processing: boolean;
-  photo?: GarmentPhoto; // set once compression is complete
+  photo?: GarmentPhoto;
   error?: string;
 }
 
 interface PhotoUploaderProps {
-  // Called with the full list of completed GarmentPhotos after each change.
-  // Will not include photos still processing.
   onChange: (photos: GarmentPhoto[]) => void;
-  // Whether any photos are still compressing — parent uses this to gate save.
   onProcessingChange?: (processing: boolean) => void;
+  // Pre-load existing photos when editing a garment.
+  initialPhotos?: GarmentPhoto[];
 }
 
-export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderProps) {
+export function PhotoUploader({ onChange, onProcessingChange, initialPhotos }: PhotoUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [slots, setSlots] = useState<Slot[]>([]);
 
-  // Keep a stable ref to callbacks so effects don't need them in deps.
+  // Build initial slots from existing photos (edit mode).
+  // blobToUrl creates an object URL we need to clean up on unmount.
+  const [slots, setSlots] = useState<Slot[]>(() =>
+    (initialPhotos ?? []).map((photo) => ({
+      id: photo.id,
+      tag: photo.tag,
+      previewUrl: blobToUrl(photo.thumbnail),
+      processing: false,
+      photo,
+    })),
+  );
+
+  // Revoke all object URLs when the component unmounts.
+  // We track the set of URLs created so we only revoke what we own.
+  const ownedUrls = useRef(new Set<string>());
+
+  useEffect(() => {
+    // Register initial URLs
+    slots.forEach((s) => ownedUrls.current.add(s.previewUrl));
+    return () => {
+      ownedUrls.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const onChangeRef = useRef(onChange);
   const onProcessingRef = useRef(onProcessingChange);
   useLayoutEffect(() => {
@@ -42,27 +62,25 @@ export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderPro
   });
 
   function notifyParent(nextSlots: Slot[]) {
-    const completed = nextSlots
-      .filter((s) => !s.processing && s.photo)
-      .map((s) => s.photo!);
+    const completed = nextSlots.filter((s) => !s.processing && s.photo).map((s) => s.photo!);
     onChangeRef.current(completed);
-
-    const anyProcessing = nextSlots.some((s) => s.processing);
-    onProcessingRef.current?.(anyProcessing);
+    onProcessingRef.current?.(nextSlots.some((s) => s.processing));
   }
 
   async function handleFiles(files: File[]) {
     if (files.length === 0) return;
 
     const startIndex = slots.length;
-
-    // Create slots immediately for instant visual feedback.
-    const newSlots: Slot[] = files.map((file, i) => ({
-      id: generateId(),
-      tag: defaultTag(startIndex + i),
-      previewUrl: URL.createObjectURL(file),
-      processing: true,
-    }));
+    const newSlots: Slot[] = files.map((file, i) => {
+      const url = blobToUrl(file);
+      ownedUrls.current.add(url);
+      return {
+        id: generateId(),
+        tag: defaultTag(startIndex + i),
+        previewUrl: url,
+        processing: true,
+      };
+    });
 
     setSlots((prev) => {
       const next = [...prev, ...newSlots];
@@ -70,7 +88,6 @@ export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderPro
       return next;
     });
 
-    // Compress each photo. We fire them all and update slots as each finishes.
     await Promise.all(
       files.map(async (file, i) => {
         const slotId = newSlots[i].id;
@@ -87,18 +104,14 @@ export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderPro
             capturedAt: new Date().toISOString(),
           };
           setSlots((prev) => {
-            const next = prev.map((s) =>
-              s.id === slotId ? { ...s, processing: false, photo } : s,
-            );
+            const next = prev.map((s) => s.id === slotId ? { ...s, processing: false, photo } : s);
             notifyParent(next);
             return next;
           });
         } catch {
           setSlots((prev) => {
             const next = prev.map((s) =>
-              s.id === slotId
-                ? { ...s, processing: false, error: 'Failed to process' }
-                : s,
+              s.id === slotId ? { ...s, processing: false, error: 'Failed' } : s,
             );
             notifyParent(next);
             return next;
@@ -110,7 +123,6 @@ export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderPro
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
-    // Reset so the same file can be selected again later.
     e.target.value = '';
     void handleFiles(files);
   }
@@ -119,8 +131,7 @@ export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderPro
     setSlots((prev) => {
       const next = prev.map((s) => {
         if (s.id !== slotId) return s;
-        const updatedPhoto = s.photo ? { ...s.photo, tag } : undefined;
-        return { ...s, tag, photo: updatedPhoto };
+        return { ...s, tag, photo: s.photo ? { ...s.photo, tag } : undefined };
       });
       notifyParent(next);
       return next;
@@ -130,7 +141,10 @@ export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderPro
   function remove(slotId: string) {
     setSlots((prev) => {
       const slot = prev.find((s) => s.id === slotId);
-      if (slot) URL.revokeObjectURL(slot.previewUrl);
+      if (slot) {
+        URL.revokeObjectURL(slot.previewUrl);
+        ownedUrls.current.delete(slot.previewUrl);
+      }
       const next = prev.filter((s) => s.id !== slotId);
       notifyParent(next);
       return next;
@@ -141,8 +155,6 @@ export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderPro
 
   return (
     <div className={styles.uploader}>
-      {/* Hidden file input — `multiple` lets users pick several at once.
-          No `capture` attribute so iOS shows "Photo Library" option.       */}
       <input
         ref={inputRef}
         type="file"
@@ -157,24 +169,16 @@ export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderPro
         <div className={styles.grid}>
           {slots.map((slot) => (
             <div key={slot.id} className={styles.slot}>
-              <img
-                src={slot.previewUrl}
-                alt={`${slot.tag} photo`}
-                className={styles.slotImg}
-              />
+              <img src={slot.previewUrl} alt={`${slot.tag} photo`} className={styles.slotImg} />
 
-              {/* Spinner while compressing */}
               {slot.processing && (
                 <div className={styles.overlay} aria-hidden="true">
                   <span className={styles.spinner} />
                 </div>
               )}
 
-              {/* Error state */}
               {slot.error && (
-                <div className={styles.overlayError} role="alert">
-                  <span>⚠</span>
-                </div>
+                <div className={styles.overlayError} role="alert">⚠</div>
               )}
 
               <button
@@ -182,20 +186,14 @@ export function PhotoUploader({ onChange, onProcessingChange }: PhotoUploaderPro
                 onClick={() => remove(slot.id)}
                 aria-label="Remove photo"
                 type="button"
-              >
-                ✕
-              </button>
+              >✕</button>
 
-              {/* Tag chips below each photo */}
               <div className={styles.tagRow}>
                 {PHOTO_TAGS.map((t) => (
                   <button
                     key={t}
                     type="button"
-                    className={[
-                      styles.tagChip,
-                      slot.tag === t ? styles.tagChipActive : '',
-                    ].join(' ')}
+                    className={[styles.tagChip, slot.tag === t ? styles.tagChipActive : ''].join(' ')}
                     onClick={() => setTag(slot.id, t)}
                     aria-pressed={slot.tag === t}
                   >

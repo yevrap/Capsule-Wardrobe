@@ -1,14 +1,28 @@
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
 .backBtn {
   font-size: 14px;
   color: var(--c-text-muted);
-  margin-bottom: 24px;
-  display: block;
   transition: color 0.15s;
 }
 
 .backBtn:hover { color: var(--c-text); }
 
-/* Horizontal scrollable photo strip */
+.editBtn {
+  font-size: 14px;
+  color: var(--c-accent);
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.editBtn:hover { opacity: 0.75; }
+
+/* Scrollable photo strip */
 .photoStrip {
   display: flex;
   gap: 10px;
@@ -32,11 +46,17 @@
   background: var(--c-surface);
 }
 
+@media (min-width: 768px) {
+  .photoStrip { margin: 0 -40px 32px; padding: 0 40px; }
+}
+
+/* Metadata */
 .meta {
   display: flex;
   flex-direction: column;
   gap: 12px;
   max-width: 540px;
+  margin-bottom: 48px;
 }
 
 .name {
@@ -84,4 +104,38 @@
   color: var(--c-accent);
   text-decoration: underline;
   text-underline-offset: 3px;
+  align-self: flex-start;
+}
+
+/* Delete area */
+.deleteArea {
+  max-width: 540px;
+  padding-top: 8px;
+  border-top: 1px solid var(--c-border);
+}
+
+.deleteBtn {
+  font-size: 13px;
+  color: var(--c-text-faint);
+  transition: color 0.15s;
+  padding: 16px 0;
+}
+
+.deleteBtn:hover { color: var(--c-danger); }
+
+.confirmRow {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.confirmText {
+  font-size: 14px;
+  color: var(--c-text);
+}
+
+.confirmActions {
+  display: flex;
+  gap: 10px;
 }

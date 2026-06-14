@@ -5,6 +5,7 @@ import { Onboarding } from '@/pages/Onboarding';
 import { Inventory } from '@/pages/Inventory';
 import { AddGarment } from '@/pages/AddGarment';
 import { ItemDetail } from '@/pages/ItemDetail';
+import { EditGarment } from '@/pages/EditGarment';
 import { Outfits } from '@/pages/Outfits';
 import { DataPage } from '@/pages/DataPage';
 
@@ -32,7 +33,8 @@ function AppRoutes() {
         <Route path="/"          element={<Navigate to="/inventory" replace />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/add"        element={<AddGarment />} />
-        <Route path="/item/:id"  element={<ItemDetail />} />
+        <Route path="/item/:id"       element={<ItemDetail />} />
+        <Route path="/item/:id/edit"  element={<EditGarment />} />
         <Route path="/outfits"   element={<Outfits />} />
         <Route path="/data"      element={<DataPage />} />
         <Route path="*"          element={<Navigate to="/inventory" replace />} />
