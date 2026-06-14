@@ -125,12 +125,16 @@ export interface Outfit {
 export interface WearLog {
   id: string;
   ownerId: string;
-  date: string; // ISO date (day only)
-  garmentIds: string[];
+  date: string; // YYYY-MM-DD
+  photo?: {
+    compressed: Blob; // ~1200px / 85% JPEG — same spec as GarmentPhoto.compressed
+    thumbnail:  Blob; // ~400px  / 75% JPEG — same spec as GarmentPhoto.thumbnail
+  };
   outfitId?: string;
-  context?: string; // 'work' | 'play' | 'town' or free text
+  garmentIds: string[];
+  tags: string[];
   notes?: string;
-  createdAt: string;
+  createdAt: string; // ISO datetime
 }
 
 // ─── Stores ──────────────────────────────────────────────────────────────────

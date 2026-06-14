@@ -19,6 +19,35 @@
   margin-bottom: 16px;
 }
 
+/* ─── Tab row ─────────────────────────────────────────────────────────────── */
+
+.tabRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.tabBtn {
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+  min-height: 32px;
+}
+.tabBtn:hover  { border-color: var(--c-text-muted); color: var(--c-text); }
+.tabBtn:active { opacity: 0.7; }
+.tabBtnActive {
+  background: var(--c-surface-2);
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
 .emptyIcon { font-size: 3rem; color: var(--c-text-faint); }
 
 /* ─── Outfit grid ─────────────────────────────────────────────────────────── */

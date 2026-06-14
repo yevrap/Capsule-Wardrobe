@@ -1,32 +1,34 @@
-import { NavLink } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useProfiles } from '@/contexts/ProfileContext';
 import styles from './Nav.module.css';
 
 const NAV_ITEMS = [
-  { to: '/inventory', icon: '▤', label: 'Wardrobe' },
-  { to: '/add',       icon: '+', label: 'Add' },
-  { to: '/outfits',   icon: '◈', label: 'Outfits' },
-  { to: '/settings',  icon: '⚙', label: 'Settings' },
+  { to: '/inventory', icon: '▤', label: 'Wardrobe', match: ['/inventory', '/add', '/item'] },
+  { to: '/outfits',   icon: '◈', label: 'Outfits',  match: ['/outfits', '/outfit', '/journal'] },
+  { to: '/settings',  icon: '⚙', label: 'Settings', match: ['/settings'] },
 ] as const;
 
 export function Nav() {
   const { profiles, activeProfile, setActiveProfileId } = useProfiles();
+  const location = useLocation();
+
+  function isActive(match: readonly string[]): boolean {
+    return match.some((prefix) => location.pathname.startsWith(prefix));
+  }
 
   return (
     <>
       {/* ── Mobile: bottom tab bar ─────────────────────────────────────── */}
       <nav className={styles.bottomNav} aria-label="Main navigation">
-        {NAV_ITEMS.map(({ to, icon, label }) => (
-          <NavLink
+        {NAV_ITEMS.map(({ to, icon, label, match }) => (
+          <Link
             key={to}
             to={to}
-            className={({ isActive }) =>
-              [styles.tab, isActive ? styles.tabActive : ''].join(' ')
-            }
+            className={[styles.tab, isActive(match) ? styles.tabActive : ''].join(' ')}
           >
             <span className={styles.tabIcon} aria-hidden="true">{icon}</span>
             <span className={styles.tabLabel}>{label}</span>
-          </NavLink>
+          </Link>
         ))}
       </nav>
 
@@ -35,17 +37,15 @@ export function Nav() {
         <div className={styles.sidebarLogo}>Capsule</div>
 
         <nav className={styles.sidebarNav}>
-          {NAV_ITEMS.map(({ to, icon, label }) => (
-            <NavLink
+          {NAV_ITEMS.map(({ to, icon, label, match }) => (
+            <Link
               key={to}
               to={to}
-              className={({ isActive }) =>
-                [styles.sidebarLink, isActive ? styles.sidebarLinkActive : ''].join(' ')
-              }
+              className={[styles.sidebarLink, isActive(match) ? styles.sidebarLinkActive : ''].join(' ')}
             >
               <span className={styles.sidebarIcon} aria-hidden="true">{icon}</span>
               {label}
-            </NavLink>
+            </Link>
           ))}
         </nav>
 

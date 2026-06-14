@@ -141,6 +141,20 @@ export function Outfits() {
         </button>
       </header>
 
+      {/* ── Tab row: Saved / Journal ─────────────────────────────────── */}
+      <div className={styles.tabRow}>
+        <button type="button" className={[styles.tabBtn, styles.tabBtnActive].join(' ')}>
+          Saved
+        </button>
+        <button
+          type="button"
+          className={styles.tabBtn}
+          onClick={() => navigate('/journal')}
+        >
+          Journal
+        </button>
+      </div>
+
       {total === 0 ? (
         <div className="empty-state">
           <span className={styles.emptyIcon} aria-hidden="true">◈</span>

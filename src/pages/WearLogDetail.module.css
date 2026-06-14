@@ -1,0 +1,172 @@
+/* No global .page padding — we manage padding per section so the photo is full-bleed */
+.detail {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  animation: page-enter 0.15s ease-out both;
+}
+
+/* ─── Top bar ────────────────────────────────────────────────────────────────*/
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  flex-shrink: 0;
+}
+
+.backBtn {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  transition: color 0.15s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.backBtn:hover  { color: var(--c-text); }
+.backBtn:active { opacity: 0.6; }
+
+.editBtn {
+  font-size: 14px;
+  color: var(--c-accent);
+  transition: opacity 0.15s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.editBtn:hover  { opacity: 0.75; }
+.editBtn:active { opacity: 0.5; }
+
+/* ─── Photo ──────────────────────────────────────────────────────────────────*/
+
+.photoWrap {
+  width: 100%;
+  max-height: 60svh;
+  overflow: hidden;
+  background: var(--c-surface);
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─── Body ───────────────────────────────────────────────────────────────────*/
+
+.body {
+  padding: 24px 24px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.dateLabel {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--c-text);
+  letter-spacing: -0.01em;
+}
+
+.notes {
+  font-size: 15px;
+  color: var(--c-text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  border: 1px solid var(--c-border);
+  color: var(--c-text-muted);
+}
+
+/* ─── Linked outfit ──────────────────────────────────────────────────────────*/
+
+.linkedSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.linkedOutfit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.12s;
+}
+.linkedOutfit:hover  { border-color: var(--c-text-muted); }
+.linkedOutfit:active { opacity: 0.75; }
+
+.linkedOutfitName {
+  font-size: 14px;
+  color: var(--c-text);
+  flex: 1;
+}
+
+.linkedOutfitMeta {
+  font-size: 12px;
+  color: var(--c-text-muted);
+}
+
+.linkedChevron {
+  font-size: 18px;
+  color: var(--c-text-muted);
+}
+
+.emptyNote {
+  font-size: 14px;
+  color: var(--c-text-muted);
+}
+
+/* ─── Delete ─────────────────────────────────────────────────────────────────*/
+
+.deleteArea {
+  padding: 24px;
+  border-top: 1px solid var(--c-border);
+  margin-top: auto;
+}
+
+.deleteBtn {
+  font-size: 14px;
+  color: var(--c-text-muted);
+  transition: color 0.15s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.deleteBtn:hover  { color: var(--c-danger); }
+.deleteBtn:active { opacity: 0.7; }
+
+.confirmRow {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.confirmText {
+  font-size: 14px;
+  color: var(--c-text-muted);
+}
+
+.confirmActions {
+  display: flex;
+  gap: 10px;
+}

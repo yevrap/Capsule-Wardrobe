@@ -25,6 +25,11 @@ class CapsuleDB extends Dexie {
       wearLogs: 'id, ownerId, date, outfitId',
       stores:   'id, name',
     });
+
+    // v2: add compound index + *tags to wearLogs for calendar queries and tag filtering.
+    this.version(2).stores({
+      wearLogs: 'id, ownerId, date, outfitId, *tags, [ownerId+date]',
+    });
   }
 }
 

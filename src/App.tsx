@@ -10,6 +10,10 @@ import { Outfits } from '@/pages/Outfits';
 import { AddOutfit } from '@/pages/AddOutfit';
 import { OutfitDetail } from '@/pages/OutfitDetail';
 import { EditOutfit } from '@/pages/EditOutfit';
+import { JournalPage } from '@/pages/JournalPage';
+import { AddWearLog } from '@/pages/AddWearLog';
+import { EditWearLog } from '@/pages/EditWearLog';
+import { WearLogDetail } from '@/pages/WearLogDetail';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 
@@ -39,11 +43,15 @@ function AppRoutes() {
         <Route path="/add"             element={<AddGarment />} />
         <Route path="/item/:id"        element={<ItemDetail />} />
         <Route path="/item/:id/edit"   element={<EditGarment />} />
-        <Route path="/outfits"         element={<Outfits />} />
-        <Route path="/outfits/add"     element={<AddOutfit />} />
-        <Route path="/outfit/:id"      element={<OutfitDetail />} />
-        <Route path="/outfit/:id/edit" element={<EditOutfit />} />
-        <Route path="/settings"        element={<SettingsPage />} />
+        <Route path="/outfits"           element={<Outfits />} />
+        <Route path="/outfits/add"       element={<AddOutfit />} />
+        <Route path="/outfit/:id"        element={<OutfitDetail />} />
+        <Route path="/outfit/:id/edit"   element={<EditOutfit />} />
+        <Route path="/journal"           element={<JournalPage />} />
+        <Route path="/journal/add"       element={<AddWearLog />} />
+        <Route path="/journal/:id"       element={<WearLogDetail />} />
+        <Route path="/journal/:id/edit"  element={<EditWearLog />} />
+        <Route path="/settings"          element={<SettingsPage />} />
         <Route path="/data"            element={<Navigate to="/settings" replace />} />
         <Route path="*"          element={<Navigate to="/inventory" replace />} />
       </Routes>
