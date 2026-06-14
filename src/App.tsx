@@ -7,6 +7,9 @@ import { AddGarment } from '@/pages/AddGarment';
 import { ItemDetail } from '@/pages/ItemDetail';
 import { EditGarment } from '@/pages/EditGarment';
 import { Outfits } from '@/pages/Outfits';
+import { AddOutfit } from '@/pages/AddOutfit';
+import { OutfitDetail } from '@/pages/OutfitDetail';
+import { EditOutfit } from '@/pages/EditOutfit';
 import { DataPage } from '@/pages/DataPage';
 
 // AppRoutes is a child of ProfileProvider so it can read profile state.
@@ -31,12 +34,15 @@ function AppRoutes() {
     <Layout>
       <Routes>
         <Route path="/"          element={<Navigate to="/inventory" replace />} />
-        <Route path="/inventory" element={<Inventory />} />
-        <Route path="/add"        element={<AddGarment />} />
-        <Route path="/item/:id"       element={<ItemDetail />} />
-        <Route path="/item/:id/edit"  element={<EditGarment />} />
-        <Route path="/outfits"   element={<Outfits />} />
-        <Route path="/data"      element={<DataPage />} />
+        <Route path="/inventory"       element={<Inventory />} />
+        <Route path="/add"             element={<AddGarment />} />
+        <Route path="/item/:id"        element={<ItemDetail />} />
+        <Route path="/item/:id/edit"   element={<EditGarment />} />
+        <Route path="/outfits"         element={<Outfits />} />
+        <Route path="/outfits/add"     element={<AddOutfit />} />
+        <Route path="/outfit/:id"      element={<OutfitDetail />} />
+        <Route path="/outfit/:id/edit" element={<EditOutfit />} />
+        <Route path="/data"            element={<DataPage />} />
         <Route path="*"          element={<Navigate to="/inventory" replace />} />
       </Routes>
     </Layout>
