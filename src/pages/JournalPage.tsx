@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db';
 import { useProfiles } from '@/contexts/ProfileContext';
 import { blobToUrl } from '@/utils/image';
+import { ProfileSwitcher } from '@/components/ProfileSwitcher';
 import type { WearLog } from '@/types';
 import styles from './JournalPage.module.css';
 
@@ -241,6 +242,9 @@ export function JournalPage() {
           + Log
         </button>
       </header>
+
+      {/* ── Profile switcher ───────────────────────────────────────────── */}
+      <ProfileSwitcher />
 
       {/* ── Tab row ────────────────────────────────────────────────────── */}
       <div className={styles.tabRow}>

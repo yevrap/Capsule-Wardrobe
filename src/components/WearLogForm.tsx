@@ -159,14 +159,13 @@ export function WearLogForm({
               <span className={styles.photoLabel}>
                 {processing ? 'Processing…' : 'Add a photo'}
               </span>
-              <span className={styles.photoHint}>optional</span>
+              <span className={styles.photoHint}>camera or photo library</span>
             </button>
           )}
           <input
             ref={photoInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             onChange={handleFileChange}
             style={{ display: 'none' }}
             aria-label="Choose outfit photo"

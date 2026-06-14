@@ -4,6 +4,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db';
 import { useProfiles } from '@/contexts/ProfileContext';
 import { blobToUrl } from '@/utils/image';
+import { ProfileSwitcher } from '@/components/ProfileSwitcher';
 import type { Garment, Outfit } from '@/types';
 import styles from './Outfits.module.css';
 
@@ -154,6 +155,8 @@ export function Outfits() {
           Journal
         </button>
       </div>
+
+      <ProfileSwitcher />
 
       {total === 0 ? (
         <div className="empty-state">
