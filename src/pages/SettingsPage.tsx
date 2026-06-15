@@ -3,7 +3,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useProfiles } from '@/contexts/ProfileContext';
 import { db } from '@/db';
 import { generateId } from '@/utils/id';
-import { exportProfile, type ExportProgress } from '@/utils/export';
+import { exportProfile, exportProfileForAI, type ExportProgress } from '@/utils/export';
 import { previewImport, runImport, type ImportPreview, type ImportProgress } from '@/utils/import';
 import type { Profile, ProfileRole } from '@/types';
 import styles from './SettingsPage.module.css';
@@ -291,6 +291,104 @@ function UpdateSection() {
   );
 }
 
+// ─── Storage section ──────────────────────────────────────────────────────────
+
+function StorageSection({ profile }: { profile: Profile }) {
+  const [usage, setUsage] = useState<{ used: number; quota: number } | null>(null);
+  const [isPersisted, setIsPersisted] = useState<boolean | null>(null);
+  const [garmentCount, setGarmentCount] = useState(0);
+  const [photoCount, setPhotoCount] = useState(0);
+  const [threshold, setThreshold] = useState<number>(() =>
+    Math.round(parseFloat(localStorage.getItem('capsule:matchThreshold') ?? '0.85') * 100),
+  );
+
+  useEffect(() => {
+    async function load() {
+      const [estimate, persisted, garments] = await Promise.all([
+        navigator.storage?.estimate?.(),
+        navigator.storage?.persisted?.(),
+        db.garments.where('ownerId').equals(profile.id).toArray(),
+      ]);
+      if (estimate) setUsage({ used: estimate.usage ?? 0, quota: estimate.quota ?? 0 });
+      setIsPersisted(persisted ?? null);
+      setGarmentCount(garments.length);
+      setPhotoCount(garments.reduce((n, g) => n + g.photos.length, 0));
+    }
+    void load();
+  }, [profile.id]);
+
+  async function handlePersist() {
+    const granted = await navigator.storage?.persist?.();
+    setIsPersisted(granted ?? false);
+  }
+
+  function handleThresholdChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = Number(e.target.value);
+    setThreshold(val);
+    localStorage.setItem('capsule:matchThreshold', (val / 100).toFixed(2));
+  }
+
+  function formatBytes(bytes: number) {
+    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  return (
+    <section className={styles.section}>
+      <p className={styles.sectionLabel}>Storage</p>
+
+      <div className={styles.card}>
+        {usage && (
+          <div className={styles.storageRow}>
+            <span className={styles.storageLabel}>Space used</span>
+            <span className={styles.storageValue}>{formatBytes(usage.used)} of {formatBytes(usage.quota)}</span>
+          </div>
+        )}
+        <div className={styles.storageRow}>
+          <span className={styles.storageLabel}>Items</span>
+          <span className={styles.storageValue}>{garmentCount} garments · {photoCount} photos</span>
+        </div>
+        {isPersisted !== null && (
+          <div className={styles.storageRow}>
+            <span className={styles.storageLabel}>Protection</span>
+            <span className={isPersisted ? styles.persistOk : styles.persistWarning}>
+              {isPersisted ? '✓ Data protected' : '⚠ At risk of eviction'}
+            </span>
+          </div>
+        )}
+        {isPersisted === false && (
+          <button
+            type="button"
+            className="btn btn-ghost"
+            style={{ alignSelf: 'flex-start' }}
+            onClick={() => { void handlePersist(); }}
+          >
+            Protect my data
+          </button>
+        )}
+
+        <div className={styles.sliderHeader}>
+          <span className={styles.sliderLabel}>Match threshold</span>
+          <span className={styles.sliderValue}>{threshold}%</span>
+        </div>
+        <input
+          type="range"
+          className={styles.slider}
+          min={60}
+          max={99}
+          step={1}
+          value={threshold}
+          onChange={handleThresholdChange}
+          aria-label="Match threshold"
+        />
+        <p className={styles.sliderHint}>
+          Higher = only flag very close visual matches. Lower = more suggestions when scanning items.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 // ─── Export section ───────────────────────────────────────────────────────────
 
 type ExportState =
@@ -300,59 +398,109 @@ type ExportState =
   | { status: 'error'; message: string };
 
 function ExportSection({ profile }: { profile: Profile }) {
-  const [state, setState] = useState<ExportState>({ status: 'idle' });
+  const [backupState, setBackupState] = useState<ExportState>({ status: 'idle' });
+  const [aiState, setAiState] = useState<ExportState>({ status: 'idle' });
 
-  async function handleExport() {
-    setState({ status: 'running', progress: { phase: 'loading', current: 0, total: 1, label: 'Loading…' } });
+  async function handleBackupExport() {
+    setBackupState({ status: 'running', progress: { phase: 'loading', current: 0, total: 1, label: 'Loading…' } });
     try {
-      await exportProfile(profile.id, (p) => setState({ status: 'running', progress: p }));
-      setState({ status: 'done' });
-      setTimeout(() => setState({ status: 'idle' }), 3000);
+      await exportProfile(profile.id, (p) => setBackupState({ status: 'running', progress: p }));
+      setBackupState({ status: 'done' });
+      setTimeout(() => setBackupState({ status: 'idle' }), 3000);
     } catch (err) {
-      setState({ status: 'error', message: (err as Error).message });
+      setBackupState({ status: 'error', message: (err as Error).message });
     }
   }
 
-  const running = state.status === 'running';
+  async function handleAiExport() {
+    setAiState({ status: 'running', progress: { phase: 'loading', current: 0, total: 1, label: 'Loading…' } });
+    try {
+      await exportProfileForAI(profile.id, (p) => setAiState({ status: 'running', progress: p }));
+      setAiState({ status: 'done' });
+      setTimeout(() => setAiState({ status: 'idle' }), 3000);
+    } catch (err) {
+      setAiState({ status: 'error', message: (err as Error).message });
+    }
+  }
+
+  const backupRunning = backupState.status === 'running';
+  const aiRunning = aiState.status === 'running';
 
   return (
     <section className={styles.section}>
       <p className={styles.sectionLabel}>Export</p>
       <p className={styles.sectionSub}>
-        Save {profile.name}'s wardrobe as a ZIP you can keep in Files, iCloud Drive, or share anywhere.
+        Save {profile.name}'s wardrobe to Files, iCloud Drive, or share anywhere.
       </p>
 
-      <button
-        type="button"
-        className={['btn btn-primary', styles.actionBtn].join(' ')}
-        onClick={handleExport}
-        disabled={running}
-      >
-        {running ? '…' : '↑'}&nbsp;&nbsp;
-        {running ? 'Exporting…' : `Export ${profile.name}'s wardrobe`}
-      </button>
+      <div className={styles.exportBtnRow}>
+        <button
+          type="button"
+          className={['btn btn-primary', styles.actionBtn].join(' ')}
+          onClick={() => { void handleBackupExport(); }}
+          disabled={backupRunning || aiRunning}
+        >
+          {backupRunning ? '…' : '↑'}&nbsp;&nbsp;
+          {backupRunning ? 'Exporting…' : 'Backup wardrobe'}
+        </button>
 
-      {state.status === 'running' && (
+        <button
+          type="button"
+          className={['btn btn-ghost', styles.actionBtn].join(' ')}
+          onClick={() => { void handleAiExport(); }}
+          disabled={backupRunning || aiRunning}
+        >
+          {aiRunning ? '…' : '✦'}&nbsp;&nbsp;
+          {aiRunning ? 'Exporting…' : 'Export for AI'}
+        </button>
+      </div>
+
+      <p className={styles.exportHint}>
+        <strong>Backup</strong> — full ZIP for restore · <strong>Export for AI</strong> — markdown + photos for chatting with AI
+      </p>
+
+      {backupState.status === 'running' && (
         <div className={styles.progressArea} role="status">
           <div className={styles.progressBar}>
             <div
               className={styles.progressFill}
               style={{
-                width: state.progress.phase === 'compressing'
-                  ? `${state.progress.current}%`
-                  : state.progress.phase === 'done' ? '100%' : '10%',
+                width: backupState.progress.phase === 'compressing'
+                  ? `${backupState.progress.current}%`
+                  : backupState.progress.phase === 'done' ? '100%' : '10%',
               }}
             />
           </div>
-          <p className={styles.progressLabel}>{state.progress.label}</p>
+          <p className={styles.progressLabel}>{backupState.progress.label}</p>
         </div>
       )}
-
-      {state.status === 'done' && (
-        <p className={styles.successMsg} role="status">✓ Export ready — check your share sheet or downloads</p>
+      {backupState.status === 'done' && (
+        <p className={styles.successMsg} role="status">✓ Backup ready — check your share sheet or downloads</p>
       )}
-      {state.status === 'error' && (
-        <p className={styles.errorMsg} role="alert">{state.message}</p>
+      {backupState.status === 'error' && (
+        <p className={styles.errorMsg} role="alert">{backupState.message}</p>
+      )}
+
+      {aiState.status === 'running' && (
+        <div className={styles.progressArea} role="status">
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progressFill}
+              style={{
+                width: aiState.progress.phase === 'compressing'
+                  ? `${aiState.progress.current}%`
+                  : aiState.progress.phase === 'done' ? '100%' : '10%',
+              }}
+            />
+          </div>
+          <p className={styles.progressLabel}>{aiState.progress.label}</p>
+        </div>
+      )}
+      {aiState.status === 'done' && (
+        <p className={styles.successMsg} role="status">✓ AI export ready — open wardrobe.md with any AI chat</p>
+      )}
+      {aiState.status === 'error' && (
+        <p className={styles.errorMsg} role="alert">{aiState.message}</p>
       )}
     </section>
   );
@@ -533,6 +681,10 @@ export function SettingsPage() {
           ))}
         </div>
       )}
+
+      {activeProfile && <StorageSection profile={activeProfile} />}
+
+      <div className={styles.divider} />
 
       {activeProfile && <ExportSection profile={activeProfile} />}
 

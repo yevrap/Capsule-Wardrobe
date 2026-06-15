@@ -17,6 +17,9 @@ export function Onboarding() {
       goals: [],
       createdAt: new Date().toISOString(),
     });
+    // Request persistent storage so the browser won't evict IndexedDB data
+    // under storage pressure. Most browsers prompt once and remember the grant.
+    await navigator.storage?.persist?.();
     // ProfileProvider's useLiveQuery picks up the new profile and exits the
     // onboarding gate automatically — no navigate() needed.
   }

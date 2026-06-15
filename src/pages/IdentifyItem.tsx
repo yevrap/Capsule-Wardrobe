@@ -8,8 +8,6 @@ import { getModelInputData, compressOriginal, generateThumbnail } from '@/utils/
 import type { Garment } from '@/types';
 import styles from './IdentifyItem.module.css';
 
-const MATCH_THRESHOLD = 0.85;
-
 interface MatchResult {
   garment: Garment;
   score: number;
@@ -164,8 +162,9 @@ export function IdentifyItem() {
     }
 
     setProcessingState('idle');
+    const threshold = parseFloat(localStorage.getItem('capsule:matchThreshold') ?? '0.85');
     setMatchResult(
-      bestMatch && highestScore >= MATCH_THRESHOLD
+      bestMatch && highestScore >= threshold
         ? { garment: bestMatch, score: highestScore }
         : null,
     );

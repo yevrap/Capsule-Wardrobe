@@ -149,3 +149,107 @@ async function triggerDownload(blob: Blob, filename: string): Promise<void> {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+// ─── AI-readable export ──────────────────────────────────────────────────────
+//
+//   wardrobe.md          — markdown with garment metadata + outfit listings
+//   photos/<garmentId>.jpg — thumbnail for each garment (front tag preferred)
+//
+// Intended for pasting into an AI chat or agent to get outfit advice, analysis,
+// or any other text-based AI workflow. Not a full backup — omits compressed
+// images and DB IDs that are not meaningful outside the app.
+
+export async function exportProfileForAI(
+  profileId: string,
+  onProgress?: (p: ExportProgress) => void,
+): Promise<void> {
+  const [profile, garments, outfits] = await Promise.all([
+    db.profiles.get(profileId),
+    db.garments.where('ownerId').equals(profileId).toArray(),
+    db.outfits.where('ownerId').equals(profileId).toArray(),
+  ]);
+
+  if (!profile) throw new Error('Profile not found');
+
+  const zip = new JSZip();
+  const garmentMap = new Map(garments.map((g) => [g.id, g]));
+
+  // Write thumbnails
+  for (let i = 0; i < garments.length; i++) {
+    const g = garments[i];
+    onProgress?.({
+      phase: 'loading',
+      current: i + 1,
+      total: garments.length,
+      label: `Writing ${i + 1} of ${garments.length} items…`,
+    });
+    const photo = g.photos.find((p) => p.tag === 'front') ?? g.photos[0];
+    if (photo) zip.file(`photos/${g.id}.jpg`, photo.thumbnail);
+  }
+
+  // Build wardrobe.md
+  const lines: string[] = [
+    `# ${profile.name} — Wardrobe`,
+    ``,
+    `Exported ${new Date().toISOString().slice(0, 10)} · ${garments.length} items · ${outfits.length} outfits`,
+    ``,
+    `---`,
+    ``,
+    `## Garments`,
+    ``,
+  ];
+
+  for (const g of garments) {
+    lines.push(`### ${g.name}`);
+    lines.push(``);
+    lines.push(`- **Category:** ${g.category}${g.subcategory ? ` / ${g.subcategory}` : ''}`);
+    if (g.colors.length > 0)    lines.push(`- **Colors:** ${g.colors.join(', ')}`);
+    if (g.brand)                lines.push(`- **Brand:** ${g.brand}`);
+    if (g.size)                 lines.push(`- **Size:** ${g.size}${g.fit ? ` (${g.fit})` : ''}`);
+    if (g.material.length > 0)  lines.push(`- **Material:** ${g.material.join(', ')}`);
+    if (g.seasons.length > 0)   lines.push(`- **Seasons:** ${g.seasons.join(', ')}`);
+    if (g.tags.length > 0)      lines.push(`- **Tags:** ${g.tags.join(', ')}`);
+    lines.push(`- **Formality:** ${g.formality}/5 · **Warmth:** ${g.warmth}/5`);
+    lines.push(`- **Times worn:** ${g.wearCount}${g.lastWornDate ? ` · Last worn: ${g.lastWornDate}` : ''}`);
+    if (g.price != null)        lines.push(`- **Price:** ${g.price}${g.currency ? ` ${g.currency}` : ''}`);
+    if (g.notes)                lines.push(`- **Notes:** ${g.notes}`);
+    if (g.photos.length > 0)    lines.push(`- **Photo:** photos/${g.id}.jpg`);
+    lines.push(`- **Status:** ${g.status}`);
+    lines.push(``);
+  }
+
+  if (outfits.length > 0) {
+    lines.push(`---`, ``, `## Outfits`, ``);
+    for (const outfit of outfits) {
+      lines.push(`### ${outfit.name}`, ``);
+      const garmentNames = outfit.garmentIds
+        .map((id) => garmentMap.get(id)?.name ?? `(id: ${id})`)
+        .join(', ');
+      lines.push(`- **Garments:** ${garmentNames}`);
+      if (outfit.occasionTags.length > 0) lines.push(`- **Occasions:** ${outfit.occasionTags.join(', ')}`);
+      if (outfit.selfScore != null)       lines.push(`- **Rating:** ${outfit.selfScore}/5`);
+      lines.push(`- **Times worn:** ${outfit.timesWorn}${outfit.lastWorn ? ` · Last worn: ${outfit.lastWorn}` : ''}`);
+      lines.push(``);
+    }
+  }
+
+  zip.file('wardrobe.md', lines.join('\n'));
+
+  const blob = await zip.generateAsync(
+    { type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } },
+    (meta) => {
+      onProgress?.({
+        phase: 'compressing',
+        current: Math.round(meta.percent),
+        total: 100,
+        label: `Compressing… ${Math.round(meta.percent)}%`,
+      });
+    },
+  );
+
+  onProgress?.({ phase: 'done', current: 1, total: 1, label: 'Ready' });
+
+  const safeName = profile.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+  const date = new Date().toISOString().slice(0, 10);
+  await triggerDownload(blob, `capsule-${safeName}-ai-${date}.zip`);
+}
