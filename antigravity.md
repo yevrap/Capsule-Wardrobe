@@ -144,6 +144,12 @@ is unreliable on mobile. The `removeBtn` in `PhotoUploader` is 36×36px (slightl
 below guideline but a workable compromise for an overlay that shares space with
 the image).
 
+### ONNX WASM path resolving
+
+ONNX Runtime Web loaded inside a Web Worker attempts to fetch `.wasm` binaries locally relative to the worker script, which fails with 404s when the PWA is hosted on a subdirectory (e.g. GitHub Pages `/<repo-name>/`).
+Fix: Explicitly override the WASM base URL using `env.backends.onnx.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/';` inside the worker script.
+
+
 ---
 
 ## What not to do

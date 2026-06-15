@@ -4,6 +4,10 @@ import { pipeline, env, RawImage } from '@xenova/transformers';
 // enabling automatic caching via the Cache API (named 'transformers-cache').
 env.allowLocalModels = false;
 
+// Configure ONNX runtime WebAssembly paths to load from jsdelivr CDN
+// to resolve 404 errors on GitHub Pages subdirectories.
+env.backends.onnx.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/';
+
 let extractor: any = null;
 
 // Singleton helper to load the model once

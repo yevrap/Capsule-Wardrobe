@@ -53,10 +53,35 @@
   align-items: center;
   gap: 12px;
   color: var(--c-text-muted);
+  flex: 1;
+  transition: color 0.15s;
+}
+
+.cameraTrigger:hover:not(:disabled) {
+  color: var(--c-text);
+}
+
+.cameraTrigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .cameraIcon {
   font-size: 40px;
+}
+
+.triggerGroup {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.triggerDivider {
+  width: 1px;
+  height: 48px;
+  background: var(--c-border);
 }
 
 .previewImg {

@@ -19,6 +19,7 @@ export function IdentifyItem() {
   const navigate = useNavigate();
   const { activeProfile } = useProfiles();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   
   const [worker, setWorker] = useState<Worker | null>(null);
   const [modelState, setModelState] = useState<'uninitialized' | 'loading' | 'ready' | 'error'>('uninitialized');
@@ -166,6 +167,14 @@ export function IdentifyItem() {
     }
   }
 
+  // Clean up Object URL and reset page state
+  function handleReset() {
+    setSelectedPhoto(null);
+    setPreviewUrl(null);
+    setMatchResult(null);
+    setExtractedEmbedding(null);
+  }
+
   // Clean up Object URL
   useEffect(() => {
     return () => {
@@ -197,13 +206,21 @@ export function IdentifyItem() {
           </div>
         )}
 
-        {/* Input trigger */}
+        {/* Hidden triggers */}
         <input
-          ref={fileInputRef}
+          ref={cameraInputRef}
           id="cameraInput"
           type="file"
           accept="image/*"
           capture="environment"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
+        <input
+          ref={fileInputRef}
+          id="fileInput"
+          type="file"
+          accept="image/*"
           onChange={handleFileChange}
           style={{ display: 'none' }}
         />
@@ -212,15 +229,27 @@ export function IdentifyItem() {
           {previewUrl ? (
             <img src={previewUrl} alt="Captured garment" className={styles.previewImg} />
           ) : (
-            <button
-              type="button"
-              className={styles.cameraTrigger}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={modelState !== 'ready'}
-            >
-              <span className={styles.cameraIcon}>📸</span>
-              <span>Take photo to identify</span>
-            </button>
+            <div className={styles.triggerGroup}>
+              <button
+                type="button"
+                className={styles.cameraTrigger}
+                onClick={() => cameraInputRef.current?.click()}
+                disabled={modelState !== 'ready'}
+              >
+                <span className={styles.cameraIcon}>📸</span>
+                <span>Take Photo</span>
+              </button>
+              <div className={styles.triggerDivider} />
+              <button
+                type="button"
+                className={styles.cameraTrigger}
+                onClick={() => fileInputRef.current?.click()}
+                disabled={modelState !== 'ready'}
+              >
+                <span className={styles.cameraIcon}>📁</span>
+                <span>Upload Image</span>
+              </button>
+            </div>
           )}
         </div>
 
@@ -249,7 +278,7 @@ export function IdentifyItem() {
                   <button type="button" className="btn btn-primary" onClick={() => navigate(`/item/${matchResult.garment.id}`)}>
                     View Item details
                   </button>
-                  <button type="button" className="btn btn-ghost" onClick={() => fileInputRef.current?.click()}>
+                  <button type="button" className="btn btn-ghost" onClick={handleReset}>
                     Scan another
                   </button>
                 </div>
@@ -264,7 +293,7 @@ export function IdentifyItem() {
                   <button type="button" className="btn btn-primary" onClick={handleAddToInventory}>
                     Add to Inventory
                   </button>
-                  <button type="button" className="btn btn-ghost" onClick={() => fileInputRef.current?.click()}>
+                  <button type="button" className="btn btn-ghost" onClick={handleReset}>
                     Try again
                   </button>
                 </div>
