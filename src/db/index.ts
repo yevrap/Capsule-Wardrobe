@@ -31,7 +31,7 @@ class CapsuleDB extends Dexie {
       wearLogs: 'id, ownerId, date, outfitId, *tags, [ownerId+date]',
     });
 
-    // v3: add support for Garment embeddings (stored as number[] properties)
+    // v3: no schema change (was used for ML embedding fields, since removed)
     this.version(3).stores({});
   }
 }

@@ -20,14 +20,12 @@ storage bucket), not a rewrite. Design features to work offline-first.
 ### 2. Photos stored with two resolutions
 
 Every `GarmentPhoto` carries:
-- `compressed` — 1200px wide / 85% JPEG: high enough for AI image-editing APIs
-  (virtual try-on, garment extraction) without storing phone-camera originals
-  that would fill up IndexedDB fast.
+- `compressed` — 1200px wide / 85% JPEG: a reasonable quality cap that avoids
+  storing phone-camera originals (5–12 MB each) that would fill IndexedDB fast.
 - `thumbnail` — 400px wide / 75% JPEG: fast to decode and display in grids.
 
-Do not store raw camera originals. Do not generate more than these two variants
-in Phase 0–4. If an AI feature needs a different resolution, derive it at request
-time from `compressed`.
+Do not store raw camera originals. Do not generate more than these two variants.
+If a feature needs a different resolution, derive it at request time from `compressed`.
 
 ### 3. Multi-profile data model from day one
 
@@ -44,10 +42,10 @@ UI then; don't burden users now. New profiles default to `'self'`.
 
 ### 4. Scoring is rule-based, not AI
 
-Phases 2–4 scoring (cost-per-wear, pair compatibility, Elo preference) is
-pure arithmetic — transparent, fast, offline, and tunable. AI assist (Phase 5)
-augments metadata entry, it does not replace scoring. Keep scores deterministic
-so users can predict and trust them.
+Scoring (cost-per-wear, pair compatibility, Elo preference) is pure arithmetic —
+transparent, fast, offline, and tunable. Keep scores deterministic so users can
+predict and trust them. Those features are planned for the native app; see
+`CAPSULE_NATIVE.md` Phase 5.
 
 ### 5. HashRouter for routing
 
@@ -56,9 +54,18 @@ server-side rewrites. `HashRouter` (`/#/path`) requires zero server config.
 `BrowserRouter` would need a 404.html redirect hack that breaks on some hosts.
 Don't change the router without a concrete plan for the deployment target.
 
-### 6. Offline-first local ML
+### 6. ML belongs in the native app, not the browser
 
-We run model inference entirely in the browser using `@xenova/transformers` inside a Web Worker. The ONNX model (`onnx-community/mobilenet_v2_1.0_224`, quantized to 3.5 MB) is bundled in `public/models/` and deployed alongside the app — no Hugging Face CDN dependency, no auth required, no download on first use. The service worker precaches the model files so the feature works fully offline. Visual embeddings are compared using in-memory cosine similarity, keeping all AI logic local, secure, and zero-cost.
+We prototyped on-device visual matching (ONNX Runtime Web + MobileNetV2) and hit two hard
+walls: iOS Safari's WASM sandbox cannot reliably create an ONNX session, and there is no
+way to force `SharedArrayBuffer` on GitHub Pages without COOP/COEP headers Apple won't grant.
+
+The right tool is Apple's `Vision` framework (`VNGenerateImageFeaturePrintRequest`), which
+runs on the Neural Engine, needs no model download, and is available in every app that
+targets iOS 14+. That feature lives in the native SwiftUI app (`CAPSULE_NATIVE.md`), not here.
+
+The PWA stays focused on what the browser does well: fast data entry, photo management,
+outfit building, and wear tracking — all of which work reliably offline via IndexedDB.
 
 ---
 
@@ -144,23 +151,6 @@ is unreliable on mobile. The `removeBtn` in `PhotoUploader` is 36×36px (slightl
 below guideline but a workable compromise for an overlay that shares space with
 the image).
 
-### ONNX WASM path resolving
-
-ONNX Runtime Web loaded inside a Web Worker attempts to fetch `.wasm` binaries relative to the worker script's own URL. In production the worker lands inside `/assets/`, so the default path resolves wrong for a PWA served from a subdirectory (e.g. GitHub Pages `/<repo-name>/`).
-
-Fix: ship the four WASM files (`ort-wasm.wasm`, `ort-wasm-simd.wasm`, `ort-wasm-threaded.wasm`, `ort-wasm-simd-threaded.wasm`) inside `public/` so they are deployed at the app root, then override the base URL inside the worker by detecting the app root from `self.location.href`:
-
-```ts
-const workerUrl = self.location.href;
-const baseWasmPath = workerUrl.includes('/assets/')
-  ? workerUrl.substring(0, workerUrl.indexOf('/assets/')) + '/'
-  : '/';
-env.backends.onnx.wasm.wasmPaths = baseWasmPath;
-```
-
-This approach keeps WASM local so the app works fully offline after install — a CDN URL would break in airplane mode. The Workbox config in `vite.config.ts` already includes `*.wasm` in its precache glob so all four files are cached on first visit.
-
-
 ---
 
 ## What not to do
@@ -180,8 +170,7 @@ This approach keeps WASM local so the app works fully offline after install — 
 | MIME type `application/zip` in Web Share | Android auto-opens the file with its unzipper. Use `application/octet-stream` for the share target. |
 | Expose profile roles in UI        | The `role` field exists in the schema but carries no functional weight yet. Showing it forces users to make a choice that doesn't do anything. Add UI only when roles power a real feature. |
 | Gate onboarding on profile setup  | Forcing users to name and configure profiles before they can use the app is friction with no payoff. Create a sensible default ("My Wardrobe") and let them rename it in Settings. |
-| Run heavy ML models on main thread | Web Worker makes sure the interface doesn't stutter or freeze. Always offload model execution to a worker. |
-| Re-run model inference on save    | Visually extracting features once is enough. Cache the embedding in component state to make the Save transition instant. |
+| Add ML/AI to the PWA             | iOS Safari's WASM sandbox is too restricted for reliable ONNX inference. ML features belong in the native app via Apple's Vision framework. |
 
 ---
 
@@ -245,4 +234,4 @@ When adding a feature:
 4. Use `generateId()` for all new records. Use ISO 8601 for all dates.
 5. Run `npm run typecheck` before considering any change done.
 6. Ask before adding a new npm dependency. The current set is intentionally minimal.
-7. Always run local ML inference inside a Web Worker ([src/ml-worker.ts](file:///Users/yevster/Development/Clothes%20Inventory/src/ml-worker.ts)) to prevent UI blocking or frame drops.
+7. Run `npm run typecheck` before considering any change done.

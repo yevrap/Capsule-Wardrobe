@@ -5,6 +5,9 @@ Built for a family of three: self, partner, child (baby).
 
 Live: **https://yevrap.github.io/Capsule-Wardrobe/**
 
+> **Native app in progress.** See `CAPSULE_NATIVE.md` for the Swift/SwiftUI roadmap that
+> will replace this PWA. The PWA is the working prototype; the native app is the target.
+
 ---
 
 ## Stack
@@ -23,21 +26,17 @@ Live: **https://yevrap.github.io/Capsule-Wardrobe/**
 ## Repository layout
 
 ```
-ml-implementation-guide.md — implementation guide for local ML matching
-ml-sprint-tracking.md      — task tracking for local ML matching sprint
+CAPSULE_NATIVE.md  — Swift/SwiftUI native app specification and phase plan
 public/
-  models/
-    onnx-community/mobilenet_v2_1.0_224/   — self-hosted ONNX model (3.5 MB quantized)
+  icon-192.png, icon-512.png, apple-touch-icon.png
 src/
   types/index.ts          — all domain types (single source of truth)
   db/index.ts             — CapsuleDB (Dexie) + schema
-  ml-worker.ts            — Web Worker for local ONNX model feature extraction
   contexts/
     ProfileContext.tsx    — active profile, profile list, onboarding gate
   utils/
     id.ts                 — generateId() via crypto.randomUUID()
-    image.ts              — compressOriginal(), generateThumbnail(), blobToUrl(), getModelInputData()
-    math.ts               — calculateCosineSimilarity()
+    image.ts              — compressOriginal(), generateThumbnail(), blobToUrl()
     export.ts             — exportProfile() — ZIP export via JSZip
     import.ts             — previewImport(), runImport() — ZIP import
   components/
@@ -45,6 +44,7 @@ src/
     Layout.tsx + Layout.module.css   — wraps Nav around page content
     GarmentForm.tsx + .module.css    — shared Add/Edit garment form
     OutfitForm.tsx + .module.css     — shared Add/Edit outfit form
+    WearLogForm.tsx + .module.css    — shared Add/Edit wear log form
     PhotoUploader.tsx + .module.css  — multi-photo upload with compression
     TagInput.tsx + .module.css       — chip-based tag input
     UpdatePrompt.tsx + .module.css   — floating banner when a SW update is ready
@@ -53,7 +53,6 @@ src/
   pages/
     Onboarding.tsx + .module.css   — one-tap welcome; creates a default profile
     Inventory.tsx + .module.css    — garment grid with search, category, tag filter
-    IdentifyItem.tsx + .module.css — ML scanner: camera/upload, embedding extraction, cosine match
     AddGarment.tsx                 — wraps GarmentForm for new item creation
     ItemDetail.tsx + .module.css   — full item view with photo strip + delete
     EditGarment.tsx + .module.css  — wraps GarmentForm for editing an existing item
@@ -61,7 +60,11 @@ src/
     AddOutfit.tsx                  — wraps OutfitForm for new outfit creation
     OutfitDetail.tsx + .module.css — outfit view with garment tiles + delete
     EditOutfit.tsx                 — wraps OutfitForm for editing an existing outfit
-    SettingsPage.tsx + .module.css — profile management, app updates, export/import
+    JournalPage.tsx + .module.css  — daily wear log calendar view
+    AddWearLog.tsx                 — wraps WearLogForm for new wear log entry
+    WearLogDetail.tsx + .module.css — wear log entry view with garment list + delete
+    EditWearLog.tsx                — wraps WearLogForm for editing an existing entry
+    SettingsPage.tsx + .module.css — profile management, storage info, app updates, export/import
   styles/
     global.css            — design tokens + reset + reusable classes
 ```
@@ -74,12 +77,11 @@ src/
 |-------|------------------|----------------------------------------------------------|
 | 0     | ✅ complete       | PWA shell, DB schema, onboarding, nav                    |
 | 1     | ✅ complete       | Photo upload, garment form, inventory grid, search/filter, export/import, edit/delete, Settings page, profile management |
-| 2     | 🔄 in progress   | Outfits ✅ (list, create, detail, edit, delete) · wear log, cost-per-wear next |
-| 3     | later            | Scores, weather fit, insights dashboard                  |
-| 4     | later            | Comparison quiz + Elo preference ranking                 |
-| 5     | ✅ complete       | On-device ML clothing similarity matching — camera scan, cosine match, pre-populated add flow |
-| 6     | later            | AI virtual try-on                                        |
-| 7     | later            | Baby growth tracking, optional sync                      |
+| 2     | ✅ complete       | Outfits (list, create, detail, edit, delete) · wear log (add, view, edit, delete) |
+| 3     | → native app     | Outfit scoring, weather fit, insights dashboard          |
+| 4     | → native app     | Comparison quiz + Elo preference ranking                 |
+| 5     | → native app     | On-device visual matching (Vision framework, not ONNX)   |
+| 6     | → native app     | Recommendations, Siri integration, widgets               |
 
 ---
 
@@ -91,10 +93,9 @@ All types live in `src/types/index.ts`. Key relationships:
 - `Garment` → `ownerId` references `Profile.id`; `photos: GarmentPhoto[]` stores Blobs
 - `Outfit` → `garmentIds[]` references garments; `ownerId` references Profile
 - `WearLog` → records a wear event per day; links garments + optional outfit
-- `Store` → preferred retailer list (Phase 3)
 
 `GarmentPhoto` stores two Blobs per photo:
-- `compressed` — 1200px / 85% JPEG (used for AI try-on / image editing)
+- `compressed` — 1200px / 85% JPEG
 - `thumbnail`  — 400px / 75% JPEG (used for grid rendering)
 
 ---
@@ -194,11 +195,6 @@ npm run typecheck  # tsc --noEmit (no build artefacts)
 
 Push to `main`. The workflow at `.github/workflows/deploy.yml` builds with
 `VITE_BASE_PATH=/<repo-name>/` and deploys `dist/` to the `gh-pages` branch.
-
-Before first deploy:
-1. Create the GitHub repo
-2. Push this code to `main`
-3. In GitHub repo → Settings → Pages → Source: `gh-pages` branch
 
 ---
 

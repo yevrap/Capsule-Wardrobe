@@ -43,14 +43,14 @@ export type Season = 'spring' | 'summer' | 'fall' | 'winter';
 
 // Photo stored as Blobs so IndexedDB handles binary natively.
 // `tag` describes which angle/purpose the photo serves.
-// `compressed` is the original at ~1200px / 85% quality (good enough for AI try-on later).
+// `compressed` is the original at ~1200px / 85% quality.
 // `thumbnail` is ~400px / 75% quality for fast grid rendering.
 export type PhotoTag = 'front' | 'back' | 'tag' | 'detail';
 
 export interface GarmentPhoto {
   id: string;
   tag: PhotoTag;
-  compressed: Blob;  // ~1200px wide, JPEG 85% — source for AI editing
+  compressed: Blob;  // ~1200px wide, JPEG 85%
   thumbnail: Blob;   // ~400px wide, JPEG 75%  — shown in grids and lists
   capturedAt: string;
 }
