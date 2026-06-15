@@ -146,8 +146,19 @@ the image).
 
 ### ONNX WASM path resolving
 
-ONNX Runtime Web loaded inside a Web Worker attempts to fetch `.wasm` binaries locally relative to the worker script, which fails with 404s when the PWA is hosted on a subdirectory (e.g. GitHub Pages `/<repo-name>/`).
-Fix: Explicitly override the WASM base URL using `env.backends.onnx.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.14.0/dist/';` inside the worker script.
+ONNX Runtime Web loaded inside a Web Worker attempts to fetch `.wasm` binaries relative to the worker script's own URL. In production the worker lands inside `/assets/`, so the default path resolves wrong for a PWA served from a subdirectory (e.g. GitHub Pages `/<repo-name>/`).
+
+Fix: ship the four WASM files (`ort-wasm.wasm`, `ort-wasm-simd.wasm`, `ort-wasm-threaded.wasm`, `ort-wasm-simd-threaded.wasm`) inside `public/` so they are deployed at the app root, then override the base URL inside the worker by detecting the app root from `self.location.href`:
+
+```ts
+const workerUrl = self.location.href;
+const baseWasmPath = workerUrl.includes('/assets/')
+  ? workerUrl.substring(0, workerUrl.indexOf('/assets/')) + '/'
+  : '/';
+env.backends.onnx.wasm.wasmPaths = baseWasmPath;
+```
+
+This approach keeps WASM local so the app works fully offline after install — a CDN URL would break in airplane mode. The Workbox config in `vite.config.ts` already includes `*.wasm` in its precache glob so all four files are cached on first visit.
 
 
 ---

@@ -2,28 +2,37 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .backBtn {
   font-size: 14px;
   color: var(--c-text-muted);
+  flex-shrink: 0;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 480px;
-  width: 100%;
-  margin: 0 auto;
+/* ── Model status banner ─────────────────────────────────────────────────── */
+
+.statusCard {
+  margin-bottom: 20px;
+}
+
+.statusTitle {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.statusSub {
+  color: var(--c-text-muted);
+  font-size: 13px;
+  margin-top: 4px;
 }
 
 .progressContainer {
   width: 100%;
-  height: 6px;
+  height: 4px;
   background: var(--c-border);
-  border-radius: 3px;
+  border-radius: 2px;
   overflow: hidden;
   margin-top: 12px;
 }
@@ -31,12 +40,39 @@
 .progressBar {
   height: 100%;
   background: var(--c-accent);
-  transition: width 0.3s ease;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+  min-width: 4px;
+}
+
+/* ── Main layout ─────────────────────────────────────────────────────────── */
+/* Single column on mobile, two columns on wide viewports */
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+}
+
+/* ── Scan area (left column on desktop) ──────────────────────────────────── */
+
+.scanArea {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .scanSlot {
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 1 / 1;
   background: var(--c-surface);
   border: 2px dashed var(--c-border);
   border-radius: var(--r-lg);
@@ -47,27 +83,14 @@
   position: relative;
 }
 
-.cameraTrigger {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  color: var(--c-text-muted);
-  flex: 1;
-  transition: color 0.15s;
-}
-
-.cameraTrigger:hover:not(:disabled) {
-  color: var(--c-text);
-}
-
-.cameraTrigger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.cameraIcon {
-  font-size: 40px;
+/* On tall phones in landscape, cap the slot height so it stays visible */
+@media (max-height: 600px) and (orientation: landscape) {
+  .scanSlot {
+    aspect-ratio: unset;
+    height: 52vmin;
+    width: 52vmin;
+    margin: 0 auto;
+  }
 }
 
 .triggerGroup {
@@ -75,13 +98,41 @@
   align-items: center;
   justify-content: space-evenly;
   width: 100%;
+  height: 100%;
   padding: 0 16px;
+}
+
+.triggerBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--c-text-muted);
+  font-size: 13px;
+  flex: 1;
+  padding: 24px 0;
+  transition: color 0.15s;
+}
+
+.triggerBtn:hover:not(:disabled) {
+  color: var(--c-text);
+}
+
+.triggerBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .triggerDivider {
   width: 1px;
-  height: 48px;
+  height: 56px;
   background: var(--c-border);
+  flex-shrink: 0;
+}
+
+.triggerIcon {
+  font-size: 36px;
+  line-height: 1;
 }
 
 .previewImg {
@@ -90,37 +141,42 @@
   object-fit: cover;
 }
 
-.processingOverlay {
+/* Floating rescan chip overlaid on the preview image */
+.rescanBtn {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(10, 10, 10, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--c-text-muted);
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--c-border);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.rescanBtn:hover {
+  color: var(--c-text);
+  border-color: var(--c-text-muted);
+}
+
+/* ── Processing state ────────────────────────────────────────────────────── */
+
+.processingBanner {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 10px;
   color: var(--c-text-muted);
-}
-
-.matchBadge {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--c-success);
-}
-
-.actionRow {
-  display: flex;
-  gap: 12px;
-}
-
-.errorText {
-  color: var(--c-danger);
-  font-size: 12px;
-  margin-top: 8px;
+  font-size: 13px;
 }
 
 .spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
   border-top-color: var(--c-accent);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
@@ -130,3 +186,52 @@
   to { transform: rotate(360deg); }
 }
 
+/* ── Results column (right on desktop, below on mobile) ─────────────────── */
+
+.resultsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .resultsColumn {
+    padding-top: 4px;
+  }
+}
+
+.emptyHint {
+  color: var(--c-text-muted);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+@media (min-width: 1024px) {
+  .emptyHint {
+    margin-top: 32px;
+    font-size: 15px;
+  }
+}
+
+.matchBadge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--c-success);
+}
+
+/* Action buttons wrap on narrow phones so they don't overflow */
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.errorText {
+  color: var(--c-danger);
+  font-size: 13px;
+  line-height: 1.5;
+}

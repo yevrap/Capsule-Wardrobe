@@ -50,7 +50,7 @@ src/
   pages/
     Onboarding.tsx + .module.css   — one-tap welcome; creates a default profile
     Inventory.tsx + .module.css    — garment grid with search, category, tag filter
-    IdentifyItem.tsx + .module.css — [NEW] ML matching page and layout
+    IdentifyItem.tsx + .module.css — ML scanner: camera/upload, embedding extraction, cosine match
     AddGarment.tsx                 — wraps GarmentForm for new item creation
     ItemDetail.tsx + .module.css   — full item view with photo strip + delete
     EditGarment.tsx + .module.css  — wraps GarmentForm for editing an existing item
@@ -74,7 +74,7 @@ src/
 | 2     | 🔄 in progress   | Outfits ✅ (list, create, detail, edit, delete) · wear log, cost-per-wear next |
 | 3     | later            | Scores, weather fit, insights dashboard                  |
 | 4     | later            | Comparison quiz + Elo preference ranking                 |
-| 5     | 🔄 planned       | On-device ML clothing similarity matching (this sprint)  |
+| 5     | ✅ complete       | On-device ML clothing similarity matching — camera scan, cosine match, pre-populated add flow |
 | 6     | later            | AI virtual try-on                                        |
 | 7     | later            | Baby growth tracking, optional sync                      |
 
