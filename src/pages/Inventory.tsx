@@ -170,11 +170,6 @@ export function Inventory() {
                 : `${total} ${total === 1 ? 'item' : 'items'}`}
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button type="button" className="btn btn-ghost"
-                style={{ padding: '8px 14px', fontSize: 13, minHeight: 'auto' }}
-                onClick={() => navigate('/identify')}>
-                📸 Scan Match
-              </button>
               <button type="button" className="btn btn-primary"
                 style={{ padding: '8px 18px', fontSize: 13, minHeight: 'auto' }}
                 onClick={() => navigate('/add')}>

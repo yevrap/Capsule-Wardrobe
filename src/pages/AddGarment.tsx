@@ -13,7 +13,6 @@ export function AddGarment() {
 
   const state = location.state as {
     preloadedPhoto?: { compressed: Blob; thumbnail: Blob };
-    embedding?: number[];
   } | null;
 
   async function handleSave(values: GarmentFormValues) {
@@ -27,7 +26,6 @@ export function AddGarment() {
       colors: values.colors,
       material: [],
       photos: values.photos,
-      embedding: state?.embedding || undefined,
       brand:       values.brand      || undefined,
       size:        values.size       || undefined,
       formality: 3,

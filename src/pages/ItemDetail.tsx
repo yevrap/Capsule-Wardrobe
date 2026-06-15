@@ -70,15 +70,6 @@ export function ItemDetail() {
       <div className={styles.topBar}>
         <button className={styles.backBtn} onClick={() => navigate(-1)} type="button">← Back</button>
         <div style={{ display: 'flex', gap: 12 }}>
-          {garment.photos.length > 0 && (
-            <button
-              className={styles.editBtn}
-              onClick={() => navigate('/identify', { state: { sourcePhoto: garment.photos[0].compressed } })}
-              type="button"
-            >
-              🔎 Find similar
-            </button>
-          )}
           <button
             className={styles.editBtn}
             onClick={() => navigate(`/item/${garment.id}/edit`)}

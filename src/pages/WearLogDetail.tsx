@@ -71,15 +71,6 @@ export function WearLogDetail() {
           ← Back
         </button>
         <div style={{ display: 'flex', gap: 12 }}>
-          {log.photo && (
-            <button
-              type="button"
-              className={styles.editBtn}
-              onClick={() => navigate('/identify', { state: { sourcePhoto: log.photo?.compressed } })}
-            >
-              🔎 Scan items
-            </button>
-          )}
           <button
             type="button"
             className={styles.editBtn}

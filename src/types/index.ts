@@ -75,7 +75,6 @@ export interface Garment {
   material: string[]; // e.g. ['cotton', 'elastane']
 
   photos: GarmentPhoto[];
-  embedding?: number[]; // 1D feature extraction vector of size 1280 (MobileNetV2 feature dimension)
   description?: string;
 
   brand?: string;
