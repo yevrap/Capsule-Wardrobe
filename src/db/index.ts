@@ -30,6 +30,9 @@ class CapsuleDB extends Dexie {
     this.version(2).stores({
       wearLogs: 'id, ownerId, date, outfitId, *tags, [ownerId+date]',
     });
+
+    // v3: add support for Garment embeddings (stored as number[] properties)
+    this.version(3).stores({});
   }
 }
 

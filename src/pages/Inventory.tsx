@@ -169,11 +169,18 @@ export function Inventory() {
                 ? `${showing} of ${total}`
                 : `${total} ${total === 1 ? 'item' : 'items'}`}
             </p>
-            <button type="button" className="btn btn-primary"
-              style={{ padding: '8px 18px', fontSize: 13 }}
-              onClick={() => navigate('/add')}>
-              + Add
-            </button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button type="button" className="btn btn-ghost"
+                style={{ padding: '8px 14px', fontSize: 13, minHeight: 'auto' }}
+                onClick={() => navigate('/identify')}>
+                📸 Scan Match
+              </button>
+              <button type="button" className="btn btn-primary"
+                style={{ padding: '8px 18px', fontSize: 13, minHeight: 'auto' }}
+                onClick={() => navigate('/add')}>
+                + Add
+              </button>
+            </div>
           </div>
 
           {showing === 0 ? (

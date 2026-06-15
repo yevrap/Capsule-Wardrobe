@@ -59,3 +59,45 @@ export function generateThumbnail(file: File | Blob): Promise<Blob> {
 export function blobToUrl(blob: Blob): string {
   return URL.createObjectURL(blob);
 }
+
+/**
+ * Downscales a file or blob to 224x224 and returns its raw RGBA ImageData.
+ */
+export function getModelInputData(fileOrBlob: File | Blob): Promise<ImageData> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(fileOrBlob);
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 224;
+      canvas.height = 224;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error('Canvas 2D context unavailable'));
+        return;
+      }
+
+      // Draw and stretch/crop to fill 224x224 square (MobileNet standard input)
+      ctx.drawImage(img, 0, 0, 224, 224);
+      URL.revokeObjectURL(objectUrl);
+
+      try {
+        const imageData = ctx.getImageData(0, 0, 224, 224);
+        resolve(imageData);
+      } catch (err) {
+        reject(err);
+      }
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error('Image failed to load for model preprocessing'));
+    };
+
+    img.src = objectUrl;
+  });
+}
+

@@ -3,6 +3,7 @@ import { ProfileProvider, useProfiles } from '@/contexts/ProfileContext';
 import { Layout } from '@/components/Layout';
 import { Onboarding } from '@/pages/Onboarding';
 import { Inventory } from '@/pages/Inventory';
+import { IdentifyItem } from '@/pages/IdentifyItem';
 import { AddGarment } from '@/pages/AddGarment';
 import { ItemDetail } from '@/pages/ItemDetail';
 import { EditGarment } from '@/pages/EditGarment';
@@ -40,6 +41,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/"          element={<Navigate to="/inventory" replace />} />
         <Route path="/inventory"       element={<Inventory />} />
+        <Route path="/identify"        element={<IdentifyItem />} />
         <Route path="/add"             element={<AddGarment />} />
         <Route path="/item/:id"        element={<ItemDetail />} />
         <Route path="/item/:id/edit"   element={<EditGarment />} />

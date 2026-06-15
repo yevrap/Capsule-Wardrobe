@@ -1,0 +1,107 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.backBtn {
+  font-size: 14px;
+  color: var(--c-text-muted);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.progressContainer {
+  width: 100%;
+  height: 6px;
+  background: var(--c-border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.progressBar {
+  height: 100%;
+  background: var(--c-accent);
+  transition: width 0.3s ease;
+}
+
+.scanSlot {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--c-surface);
+  border: 2px dashed var(--c-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.cameraTrigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--c-text-muted);
+}
+
+.cameraIcon {
+  font-size: 40px;
+}
+
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.processingOverlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--c-text-muted);
+}
+
+.matchBadge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--c-success);
+}
+
+.actionRow {
+  display: flex;
+  gap: 12px;
+}
+
+.errorText {
+  color: var(--c-danger);
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: var(--c-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+

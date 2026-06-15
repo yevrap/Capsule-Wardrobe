@@ -164,6 +164,7 @@ the image).
 | Expose profile roles in UI        | The `role` field exists in the schema but carries no functional weight yet. Showing it forces users to make a choice that doesn't do anything. Add UI only when roles power a real feature. |
 | Gate onboarding on profile setup  | Forcing users to name and configure profiles before they can use the app is friction with no payoff. Create a sensible default ("My Wardrobe") and let them rename it in Settings. |
 | Run heavy ML models on main thread | Web Worker makes sure the interface doesn't stutter or freeze. Always offload model execution to a worker. |
+| Re-run model inference on save    | Visually extracting features once is enough. Cache the embedding in component state to make the Save transition instant. |
 
 ---
 
