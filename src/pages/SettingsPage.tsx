@@ -3,7 +3,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { useProfiles } from '@/contexts/ProfileContext';
 import { db } from '@/db';
 import { generateId } from '@/utils/id';
-import { exportProfile, type ExportProgress } from '@/utils/export';
+import { exportProfile, exportProfileLookbook, type ExportProgress } from '@/utils/export';
 import { previewImport, runImport, type ImportPreview, type ImportProgress } from '@/utils/import';
 import type { Profile, ProfileRole } from '@/types';
 import styles from './SettingsPage.module.css';
@@ -370,60 +370,96 @@ type ExportState =
   | { status: 'done' }
   | { status: 'error'; message: string };
 
-function ExportSection({ profile }: { profile: Profile }) {
-  const [state, setState] = useState<ExportState>({ status: 'idle' });
+function ExportProgress({ state }: { state: ExportState }) {
+  if (state.status === 'running') {
+    return (
+      <div className={styles.progressArea} role="status">
+        <div className={styles.progressBar}>
+          <div
+            className={styles.progressFill}
+            style={{
+              width: state.progress.phase === 'compressing'
+                ? `${state.progress.current}%`
+                : state.progress.phase === 'done' ? '100%' : '10%',
+            }}
+          />
+        </div>
+        <p className={styles.progressLabel}>{state.progress.label}</p>
+      </div>
+    );
+  }
+  if (state.status === 'done') {
+    return <p className={styles.successMsg} role="status">✓ Check your share sheet or downloads</p>;
+  }
+  if (state.status === 'error') {
+    return <p className={styles.errorMsg} role="alert">{state.message}</p>;
+  }
+  return null;
+}
 
-  async function handleExport() {
-    setState({ status: 'running', progress: { phase: 'loading', current: 0, total: 1, label: 'Loading…' } });
+function ExportSection({ profile }: { profile: Profile }) {
+  const [backupState,  setBackupState]  = useState<ExportState>({ status: 'idle' });
+  const [lookbookState, setLookbookState] = useState<ExportState>({ status: 'idle' });
+
+  async function handleBackup() {
+    setBackupState({ status: 'running', progress: { phase: 'loading', current: 0, total: 1, label: 'Loading…' } });
     try {
-      await exportProfile(profile.id, (p) => setState({ status: 'running', progress: p }));
-      setState({ status: 'done' });
-      setTimeout(() => setState({ status: 'idle' }), 3000);
+      await exportProfile(profile.id, (p) => setBackupState({ status: 'running', progress: p }));
+      setBackupState({ status: 'done' });
+      setTimeout(() => setBackupState({ status: 'idle' }), 4000);
     } catch (err) {
-      setState({ status: 'error', message: (err as Error).message });
+      setBackupState({ status: 'error', message: (err as Error).message });
     }
   }
 
-  const running = state.status === 'running';
+  async function handleLookbook() {
+    setLookbookState({ status: 'running', progress: { phase: 'loading', current: 0, total: 1, label: 'Loading…' } });
+    try {
+      await exportProfileLookbook(profile.id, (p) => setLookbookState({ status: 'running', progress: p }));
+      setLookbookState({ status: 'done' });
+      setTimeout(() => setLookbookState({ status: 'idle' }), 4000);
+    } catch (err) {
+      setLookbookState({ status: 'error', message: (err as Error).message });
+    }
+  }
 
   return (
     <section className={styles.section}>
       <p className={styles.sectionLabel}>Export</p>
-      <p className={styles.sectionSub}>
-        Save {profile.name}'s wardrobe as a ZIP you can keep in Files, iCloud Drive, or share anywhere.
-      </p>
 
-      <button
-        type="button"
-        className={['btn btn-primary', styles.actionBtn].join(' ')}
-        onClick={() => { void handleExport(); }}
-        disabled={running}
-      >
-        {running ? '…' : '↑'}&nbsp;&nbsp;
-        {running ? 'Exporting…' : `Export ${profile.name}'s wardrobe`}
-      </button>
-
-      {state.status === 'running' && (
-        <div className={styles.progressArea} role="status">
-          <div className={styles.progressBar}>
-            <div
-              className={styles.progressFill}
-              style={{
-                width: state.progress.phase === 'compressing'
-                  ? `${state.progress.current}%`
-                  : state.progress.phase === 'done' ? '100%' : '10%',
-              }}
-            />
-          </div>
-          <p className={styles.progressLabel}>{state.progress.label}</p>
+      <div className={styles.exportStack}>
+        <div className={styles.exportItem}>
+          <p className={styles.exportItemTitle}>Wardrobe backup</p>
+          <p className={styles.sectionSub}>Full ZIP backup — restores to any device running Capsule.</p>
+          <button
+            type="button"
+            className={['btn btn-primary', styles.actionBtn].join(' ')}
+            onClick={() => { void handleBackup(); }}
+            disabled={backupState.status === 'running'}
+          >
+            {backupState.status === 'running' ? '…' : '↑'}&nbsp;&nbsp;
+            {backupState.status === 'running' ? 'Exporting…' : 'Save backup'}
+          </button>
+          <ExportProgress state={backupState} />
         </div>
-      )}
-      {state.status === 'done' && (
-        <p className={styles.successMsg} role="status">✓ Export ready — check your share sheet or downloads</p>
-      )}
-      {state.status === 'error' && (
-        <p className={styles.errorMsg} role="alert">{state.message}</p>
-      )}
+
+        <div className={styles.exportItem}>
+          <p className={styles.exportItemTitle}>Lookbook</p>
+          <p className={styles.sectionSub}>
+            A self-contained webpage with all your items and outfits. Open in any browser on any device.
+          </p>
+          <button
+            type="button"
+            className={['btn btn-ghost', styles.actionBtn].join(' ')}
+            onClick={() => { void handleLookbook(); }}
+            disabled={lookbookState.status === 'running'}
+          >
+            {lookbookState.status === 'running' ? '…' : '↑'}&nbsp;&nbsp;
+            {lookbookState.status === 'running' ? 'Building…' : 'Save lookbook'}
+          </button>
+          <ExportProgress state={lookbookState} />
+        </div>
+      </div>
     </section>
   );
 }
@@ -608,11 +644,10 @@ export function SettingsPage() {
 
       <div className={styles.divider} />
 
-      {activeProfile && <ExportSection profile={activeProfile} />}
-
-      <div className={styles.divider} />
-
-      <ImportSection />
+      <div className={styles.exportRestoreRow}>
+        {activeProfile && <ExportSection profile={activeProfile} />}
+        <ImportSection />
+      </div>
     </div>
   );
 }

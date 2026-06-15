@@ -203,7 +203,11 @@ in `src/scoring/`. Never magic-number a weight inline.
 
 ## Export / import design (Phase 1)
 
-Per-profile export produces a ZIP containing:
+There are two export modes, each with a distinct purpose:
+
+### Backup ZIP (`exportProfile`)
+
+Per-profile ZIP containing:
 - `manifest.json` — version tag + counts (used for validation on import)
 - `profile.json` — profile record
 - `garments.json` — all garments (Blob references replaced with filenames)
@@ -213,12 +217,33 @@ Per-profile export produces a ZIP containing:
 Import reads the ZIP, reconstructs Blobs, and writes to Dexie. The profile `id`
 is preserved so re-importing doesn't create duplicates (upsert, not insert).
 
-The file shared on mobile uses MIME type `application/octet-stream` (not
-`application/zip`) to prevent Android from auto-extracting it. The `.zip`
-extension in the filename still tells iOS Files app and desktop OSes what it is.
+This format is the migration path if sync is ever added — a sync backend can
+consume and produce the same ZIP schema.
 
-This format is also the migration path if sync is ever added — a sync backend
-can consume and produce the same ZIP schema.
+### Lookbook HTML (`exportProfileLookbook`)
+
+A single self-contained `.html` file with no external dependencies:
+- All garment thumbnails embedded as base64 data URIs
+- Responsive garment grid (2–5 columns depending on screen width)
+- Outfit cards with garment sub-grid, occasion tags, and wear count
+- Stats summary (items, outfits, total wears, most-worn item)
+- Dark editorial design matching the app palette
+
+The lookbook is **read-only** — it cannot be imported. Its purpose is browsing,
+sharing, printing, and cross-device analysis without requiring the app.
+
+### Cross-platform sharing (both formats)
+
+`triggerDownload(blob, filename, shareTitle)`:
+1. Web Share API with files — gives the native iOS/Android share sheet (AirDrop,
+   Files app, Drive, Messages…). The share target always uses MIME type
+   `application/octet-stream`, regardless of the actual file type, to prevent
+   Android from auto-opening or auto-extracting the file.
+2. `<a download>` fallback — uses the original `blob` (with its correct MIME type)
+   so desktop browsers identify the file correctly after download.
+
+Do not change the share MIME type back to `application/zip` or `text/html` — the
+Android auto-open behavior is the reason for the override.
 
 ---
 

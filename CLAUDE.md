@@ -37,7 +37,7 @@ src/
   utils/
     id.ts                 — generateId() via crypto.randomUUID()
     image.ts              — compressOriginal(), generateThumbnail(), blobToUrl()
-    export.ts             — exportProfile() — ZIP export via JSZip
+    export.ts             — exportProfile() ZIP backup; exportProfileLookbook() self-contained HTML
     import.ts             — previewImport(), runImport() — ZIP import
   components/
     Nav.tsx + Nav.module.css         — bottom tab bar (mobile) / sidebar (desktop)
@@ -171,12 +171,23 @@ to prevent memory leaks.
 
 ## Export / Import
 
-`src/utils/export.ts` — `exportProfile(profileId, onProgress?)` builds a ZIP and calls
-`triggerDownload()`. The download tries Web Share API first (mobile), falls back to `<a download>`.
+`src/utils/export.ts` has two export modes:
+
+- `exportProfile(profileId, onProgress?)` — builds a ZIP (all photos as JPEG files +
+  JSON metadata) and calls `triggerDownload()`. Use for backup/restore.
+- `exportProfileLookbook(profileId, onProgress?)` — builds a self-contained `.html` file
+  with all garment thumbnails embedded as base64 data URIs, outfit cards, and wear stats.
+  Opens in any browser on any device with no install or app required. Good for sharing,
+  reviewing on a laptop, or sending via AirDrop/email.
+
+Both routes call `triggerDownload(blob, filename, shareTitle)` which tries Web Share API
+first (mobile share sheet) then falls back to `<a download>` (desktop). The share target
+always uses `application/octet-stream` to prevent Android from auto-opening the file.
 
 `src/utils/import.ts` — `previewImport(file)` validates the ZIP without writing.
 `runImport(file, onProgress?)` upserts via `db.profiles.put()` + `db.garments.bulkPut()`.
-Re-importing the same backup is safe (idempotent).
+Re-importing the same backup is safe (idempotent). Only the ZIP format is importable;
+the lookbook HTML is read-only.
 
 ---
 

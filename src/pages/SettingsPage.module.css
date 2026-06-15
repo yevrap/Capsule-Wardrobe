@@ -446,6 +446,55 @@
   align-items: flex-start;
 }
 
+/* ─── Export / Restore layout ───────────────────────────────────────────── */
+
+/* On mobile: Export sits above Restore with a border between them.
+   On desktop: side by side, each taking equal width. */
+.exportRestoreRow {
+  display: flex;
+  flex-direction: column;
+}
+
+.exportRestoreRow > section:last-child {
+  border-top: 1px solid var(--c-border);
+}
+
+@media (min-width: 768px) {
+  .exportRestoreRow {
+    flex-direction: row;
+    gap: 48px;
+    align-items: flex-start;
+  }
+
+  .exportRestoreRow > section {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .exportRestoreRow > section:last-child {
+    border-top: none;
+  }
+}
+
+/* Stack the two export options vertically with clear separation */
+.exportStack {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.exportItem {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.exportItemTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-text);
+}
+
 /* ─── Storage section ────────────────────────────────────────────────────── */
 
 .storageRow {
