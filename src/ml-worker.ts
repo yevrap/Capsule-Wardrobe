@@ -21,6 +21,12 @@ env.allowRemoteModels = false;
 env.localModelPath = `${appBase}models/`;
 env.backends.onnx.wasm.wasmPaths = appBase;
 
+// Force single-threaded WASM. GitHub Pages doesn't send the COOP/COEP headers
+// that iOS Safari requires to enable SharedArrayBuffer (needed for multi-threading).
+// Without this, the runtime tries the threaded path, fails to get SharedArrayBuffer,
+// and throws "Can't create a session" instead of falling back gracefully.
+env.backends.onnx.wasm.numThreads = 1;
+
 const MODEL_ID = 'onnx-community/mobilenet_v2_1.0_224';
 
 let extractor: ImageFeatureExtractionPipeline | null = null;

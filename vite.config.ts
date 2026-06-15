@@ -44,6 +44,7 @@ export default defineConfig({
         globPatterns: [
           '**/*.{js,css,html,ico,png,svg,woff2,wasm}',
           'models/**',
+          'ort-wasm-threaded*.{js,wasm}',
         ],
         maximumFileSizeToCacheInBytes: 12 * 1024 * 1024,
       },
