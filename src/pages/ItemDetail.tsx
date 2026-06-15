@@ -69,13 +69,24 @@ export function ItemDetail() {
       {/* ── Top bar ─────────────────────────────────────────────────────── */}
       <div className={styles.topBar}>
         <button className={styles.backBtn} onClick={() => navigate(-1)} type="button">← Back</button>
-        <button
-          className={styles.editBtn}
-          onClick={() => navigate(`/item/${garment.id}/edit`)}
-          type="button"
-        >
-          Edit
-        </button>
+        <div style={{ display: 'flex', gap: 12 }}>
+          {garment.photos.length > 0 && (
+            <button
+              className={styles.editBtn}
+              onClick={() => navigate('/identify', { state: { sourcePhoto: garment.photos[0].compressed } })}
+              type="button"
+            >
+              🔎 Find similar
+            </button>
+          )}
+          <button
+            className={styles.editBtn}
+            onClick={() => navigate(`/item/${garment.id}/edit`)}
+            type="button"
+          >
+            Edit
+          </button>
+        </div>
       </div>
 
       {/* Full-width photo strip — naturally flush to edges, no negative margins */}

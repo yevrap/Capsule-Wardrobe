@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/db';
 import { useProfiles } from '@/contexts/ProfileContext';
@@ -17,6 +17,7 @@ interface MatchResult {
 
 export function IdentifyItem() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { activeProfile } = useProfiles();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -66,7 +67,48 @@ export function IdentifyItem() {
     return () => {
       mlWorker.terminate();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-run if sourcePhoto is provided in router location state
+  useEffect(() => {
+    const state = location.state as {
+      sourcePhoto?: Blob | File;
+    } | null;
+
+    if (modelState === 'ready' && state?.sourcePhoto && !selectedPhoto) {
+      const file = state.sourcePhoto instanceof File 
+        ? state.sourcePhoto 
+        : new File([state.sourcePhoto], 'scanned-garment.jpg', { type: 'image/jpeg' });
+      
+      setSelectedPhoto(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+
+      const runAutoExtraction = async () => {
+        try {
+          setProcessingState('resizing');
+          const imageData = await getModelInputData(file);
+          
+          setProcessingState('embedding');
+          worker?.postMessage({
+            type: 'EXTRACT_EMBEDDING',
+            payload: {
+              width: imageData.width,
+              height: imageData.height,
+              data: imageData.data.buffer
+            }
+          }, [imageData.data.buffer]);
+        } catch (err: any) {
+          setProcessingState('idle');
+          setErrorMsg(`Pre-processing failed: ${err.message}`);
+        }
+      };
+
+      void runAutoExtraction();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modelState, location.state, worker]);
 
   // Handle image selection
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {

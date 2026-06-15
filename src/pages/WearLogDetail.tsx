@@ -70,13 +70,24 @@ export function WearLogDetail() {
         <button type="button" className={styles.backBtn} onClick={() => navigate(-1)}>
           ← Back
         </button>
-        <button
-          type="button"
-          className={styles.editBtn}
-          onClick={() => navigate(`/journal/${log.id}/edit`)}
-        >
-          Edit
-        </button>
+        <div style={{ display: 'flex', gap: 12 }}>
+          {log.photo && (
+            <button
+              type="button"
+              className={styles.editBtn}
+              onClick={() => navigate('/identify', { state: { sourcePhoto: log.photo?.compressed } })}
+            >
+              🔎 Scan items
+            </button>
+          )}
+          <button
+            type="button"
+            className={styles.editBtn}
+            onClick={() => navigate(`/journal/${log.id}/edit`)}
+          >
+            Edit
+          </button>
+        </div>
       </div>
 
       {/* ── Photo ──────────────────────────────────────────────────────── */}
