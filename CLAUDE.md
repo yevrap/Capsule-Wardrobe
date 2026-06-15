@@ -23,14 +23,18 @@ Live: **https://yevrap.github.io/Capsule-Wardrobe/**
 ## Repository layout
 
 ```
+ml-implementation-guide.md — implementation guide for local ML matching
+ml-sprint-tracking.md      — task tracking for local ML matching sprint
 src/
   types/index.ts          — all domain types (single source of truth)
   db/index.ts             — CapsuleDB (Dexie) + schema
+  ml-worker.ts            — Web Worker for local ONNX model feature extraction
   contexts/
     ProfileContext.tsx    — active profile, profile list, onboarding gate
   utils/
     id.ts                 — generateId() via crypto.randomUUID()
-    image.ts              — compressOriginal(), generateThumbnail(), blobToUrl()
+    image.ts              — compressOriginal(), generateThumbnail(), blobToUrl(), getModelInputData()
+    math.ts               — calculateCosineSimilarity()
     export.ts             — exportProfile() — ZIP export via JSZip
     import.ts             — previewImport(), runImport() — ZIP import
   components/
@@ -46,6 +50,7 @@ src/
   pages/
     Onboarding.tsx + .module.css   — one-tap welcome; creates a default profile
     Inventory.tsx + .module.css    — garment grid with search, category, tag filter
+    IdentifyItem.tsx + .module.css — [NEW] ML matching page and layout
     AddGarment.tsx                 — wraps GarmentForm for new item creation
     ItemDetail.tsx + .module.css   — full item view with photo strip + delete
     EditGarment.tsx + .module.css  — wraps GarmentForm for editing an existing item
@@ -69,7 +74,7 @@ src/
 | 2     | 🔄 in progress   | Outfits ✅ (list, create, detail, edit, delete) · wear log, cost-per-wear next |
 | 3     | later            | Scores, weather fit, insights dashboard                  |
 | 4     | later            | Comparison quiz + Elo preference ranking                 |
-| 5     | later            | AI auto-tagging + tag OCR                               |
+| 5     | 🔄 planned       | On-device ML clothing similarity matching (this sprint)  |
 | 6     | later            | AI virtual try-on                                        |
 | 7     | later            | Baby growth tracking, optional sync                      |
 

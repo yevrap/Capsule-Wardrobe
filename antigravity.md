@@ -56,6 +56,10 @@ server-side rewrites. `HashRouter` (`/#/path`) requires zero server config.
 `BrowserRouter` would need a 404.html redirect hack that breaks on some hosts.
 Don't change the router without a concrete plan for the deployment target.
 
+### 6. Offline-first local ML
+
+We run model inference entirely in the browser using `@xenova/transformers` inside a Web Worker. Model files are stored in the browser's Cache Storage via the library's built-in caching system. Visual embeddings are compared using in-memory cosine similarity, keeping all AI logic local, secure, and zero-cost.
+
 ---
 
 ## Design principles
@@ -159,6 +163,7 @@ the image).
 | MIME type `application/zip` in Web Share | Android auto-opens the file with its unzipper. Use `application/octet-stream` for the share target. |
 | Expose profile roles in UI        | The `role` field exists in the schema but carries no functional weight yet. Showing it forces users to make a choice that doesn't do anything. Add UI only when roles power a real feature. |
 | Gate onboarding on profile setup  | Forcing users to name and configure profiles before they can use the app is friction with no payoff. Create a sensible default ("My Wardrobe") and let them rename it in Settings. |
+| Run heavy ML models on main thread | Web Worker makes sure the interface doesn't stutter or freeze. Always offload model execution to a worker. |
 
 ---
 
@@ -222,3 +227,4 @@ When adding a feature:
 4. Use `generateId()` for all new records. Use ISO 8601 for all dates.
 5. Run `npm run typecheck` before considering any change done.
 6. Ask before adding a new npm dependency. The current set is intentionally minimal.
+7. Always run local ML inference inside a Web Worker ([src/ml-worker.ts](file:///Users/yevster/Development/Clothes%20Inventory/src/ml-worker.ts)) to prevent UI blocking or frame drops.
