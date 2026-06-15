@@ -58,7 +58,7 @@ Don't change the router without a concrete plan for the deployment target.
 
 ### 6. Offline-first local ML
 
-We run model inference entirely in the browser using `@xenova/transformers` inside a Web Worker. Model files are stored in the browser's Cache Storage via the library's built-in caching system. Visual embeddings are compared using in-memory cosine similarity, keeping all AI logic local, secure, and zero-cost.
+We run model inference entirely in the browser using `@xenova/transformers` inside a Web Worker. The ONNX model (`onnx-community/mobilenet_v2_1.0_224`, quantized to 3.5 MB) is bundled in `public/models/` and deployed alongside the app — no Hugging Face CDN dependency, no auth required, no download on first use. The service worker precaches the model files so the feature works fully offline. Visual embeddings are compared using in-memory cosine similarity, keeping all AI logic local, secure, and zero-cost.
 
 ---
 

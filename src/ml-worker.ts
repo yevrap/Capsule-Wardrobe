@@ -1,38 +1,46 @@
-import { pipeline, env, RawImage } from '@xenova/transformers';
+import {
+  pipeline,
+  env,
+  RawImage,
+  type ImageFeatureExtractionPipeline,
+  type Tensor,
+} from '@xenova/transformers';
 
-// Configure transformers env to use CDN instead of local models,
-// enabling automatic caching via the Cache API (named 'transformers-cache').
-env.allowLocalModels = false;
-
-// Detect the base path dynamically from the worker location to load WASM locally
+// Detect the app base URL from the worker's own URL.
+// In production the worker is at /assets/ml-worker-xxx.js, so strip /assets/...
+// In Vite dev mode it falls back to the origin root.
 const workerUrl = self.location.href;
-let baseWasmPath = '/';
-if (workerUrl.includes('/assets/')) {
-  // Production build (inside /assets/ folder)
-  baseWasmPath = workerUrl.substring(0, workerUrl.indexOf('/assets/')) + '/';
-} else {
-  // Development server
-  baseWasmPath = '/';
-}
-env.backends.onnx.wasm.wasmPaths = baseWasmPath;
+const appBase = workerUrl.includes('/assets/')
+  ? workerUrl.substring(0, workerUrl.indexOf('/assets/')) + '/'
+  : new URL('/', self.location.href).href;
 
-let extractor: any = null;
+// Load the model from the bundled /models/ directory instead of Hugging Face CDN.
+// Keeps the app fully offline-capable and avoids HF auth requirements.
+env.allowLocalModels = true;
+env.allowRemoteModels = false;
+env.localModelPath = `${appBase}models/`;
+env.backends.onnx.wasm.wasmPaths = appBase;
 
-// Singleton helper to load the model once
-async function getExtractor(onProgress: (progress: number) => void) {
+const MODEL_ID = 'onnx-community/mobilenet_v2_1.0_224';
+
+let extractor: ImageFeatureExtractionPipeline | null = null;
+
+async function getExtractor(
+  onProgress: (progress: number) => void,
+): Promise<ImageFeatureExtractionPipeline> {
   if (!extractor) {
-    extractor = await pipeline('feature-extraction', 'Xenova/mobilenet_v2_1.0_224', {
-      progress_callback: (data: any) => {
-        if (data.status === 'progress') {
+    extractor = await pipeline('image-feature-extraction', MODEL_ID, {
+      progress_callback: (data: { status: string; progress?: number }) => {
+        if (data.status === 'progress' && data.progress != null) {
           onProgress(data.progress);
         }
-      }
+      },
     });
   }
   return extractor;
 }
 
-self.onmessage = async (event: MessageEvent) => {
+self.onmessage = async (event: MessageEvent<{ type: string; payload?: unknown }>) => {
   const { type, payload } = event.data;
 
   if (type === 'INIT') {
@@ -41,32 +49,33 @@ self.onmessage = async (event: MessageEvent) => {
         self.postMessage({ type: 'LOADING_PROGRESS', payload: progress });
       });
       self.postMessage({ type: 'READY' });
-    } catch (err: any) {
-      self.postMessage({ type: 'ERROR', payload: `Failed to load model: ${err.message}` });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      self.postMessage({ type: 'ERROR', payload: `Failed to load model: ${msg}` });
     }
   }
 
   if (type === 'EXTRACT_EMBEDDING') {
     try {
-      const { width, height, data } = payload; // data is ArrayBuffer or Uint8ClampedArray from ImageData
-      
-      // Load raw image tensor (RGBA, 4 channels)
-      const rawImage = new RawImage(new Uint8Array(data), width, height, 4);
-      
-      const extractorInstance = await getExtractor(() => {});
-      
-      // Execute inference with mean pooling and normalization to obtain 1D vector
-      const output = await extractorInstance(rawImage, {
-        pooling: 'mean',
-        normalize: true,
-      });
+      const { width, height, data } = payload as {
+        width: number;
+        height: number;
+        data: ArrayBuffer;
+      };
 
-      // output.data is a Float32Array
-      const embedding = Array.from(output.data);
-      
+      // RawImage expects a Uint8Array; ImageData.buffer contains the raw RGBA bytes.
+      const rawImage = new RawImage(new Uint8Array(data), width, height, 4);
+      const pipe = await getExtractor(() => {});
+
+      // MobileNetV2 with image-feature-extraction returns a Tensor.
+      // We cast data to Float32Array — the actual element type for float models.
+      const output = (await pipe(rawImage)) as Tensor;
+      const embedding = Array.from(output.data as Float32Array);
+
       self.postMessage({ type: 'EMBEDDING_SUCCESS', payload: embedding });
-    } catch (err: any) {
-      self.postMessage({ type: 'ERROR', payload: `Extraction failed: ${err.message}` });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      self.postMessage({ type: 'ERROR', payload: `Extraction failed: ${msg}` });
     }
   }
 };

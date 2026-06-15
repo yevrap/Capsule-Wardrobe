@@ -235,7 +235,7 @@ export function IdentifyItem() {
             <>
               <p className={styles.statusTitle}>Preparing on-device AI</p>
               <p className={styles.statusSub}>
-                First load downloads ~13 MB and caches for offline use.
+                Loading the on-device model — takes a few seconds on first use.
               </p>
               <div className={styles.progressContainer}>
                 <div

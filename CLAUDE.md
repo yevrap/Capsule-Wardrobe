@@ -25,6 +25,9 @@ Live: **https://yevrap.github.io/Capsule-Wardrobe/**
 ```
 ml-implementation-guide.md — implementation guide for local ML matching
 ml-sprint-tracking.md      — task tracking for local ML matching sprint
+public/
+  models/
+    onnx-community/mobilenet_v2_1.0_224/   — self-hosted ONNX model (3.5 MB quantized)
 src/
   types/index.ts          — all domain types (single source of truth)
   db/index.ts             — CapsuleDB (Dexie) + schema
