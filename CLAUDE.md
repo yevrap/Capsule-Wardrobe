@@ -8,6 +8,16 @@ Live: **https://yevrap.github.io/Capsule-Wardrobe/**
 > **Native app in progress.** See `CAPSULE_NATIVE.md` for the Swift/SwiftUI roadmap that
 > will replace this PWA. The PWA is the working prototype; the native app is the target.
 
+## Vault Context
+
+Product planning, backlogs, and design decisions live in the Obsidian vault:
+- **Vault:** `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Optimistic Staircase/`
+- **Project notes:** `30-39 Indy App Dev/35 Clothes Inventory/`
+- **Backlog:** `30-39 Indy App Dev/35 Clothes Inventory/Backlog.md`
+- **Development Index:** `30-39 Indy App Dev/Development Index.md`
+
+Read the vault backlog before starting a new feature. Keep this file technical-only.
+
 ---
 
 ## Stack

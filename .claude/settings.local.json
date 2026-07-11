@@ -12,7 +12,15 @@
       "Bash(git branch *)",
       "Bash(git commit -m ' *)",
       "Bash(git remote *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('deps:', list\\(d.get\\('dependencies',{}\\).keys\\(\\)\\)\\); print\\('devdeps:', list\\(d.get\\('devDependencies',{}\\).keys\\(\\)\\)\\)\")",
+      "Bash(curl -sL -o /dev/null -w \"%{http_code}\" \"https://huggingface.co/onnx-community/mobilenet_v2_1.0_224/resolve/main/config.json\")",
+      "Bash(curl -sL \"https://huggingface.co/onnx-community/mobilenet_v2_1.0_224/resolve/main/config.json\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('model_type:', d.get\\('model_type'\\), 'id2label count:', len\\(d.get\\('id2label', {}\\)\\)\\)\")",
+      "Bash(curl -sIL \"https://huggingface.co/onnx-community/mobilenet_v2_1.0_224/resolve/main/onnx/model_quantized.onnx\")",
+      "Bash(npx tsc *)",
+      "Bash(npm uninstall *)",
+      "Bash(git reset *)"
     ]
   }
 }
