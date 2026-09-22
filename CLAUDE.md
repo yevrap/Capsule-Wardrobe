@@ -1,22 +1,16 @@
 # Capsule — Agent Context
 
 A local-first PWA wardrobe inventory app. One codebase covers iOS, Android, Mac, and web.
-Built for a family of three: self, partner, child (baby).
+Supports multiple wardrobe profiles in one app.
 
 Live: **https://yevrap.github.io/Capsule-Wardrobe/**
 
 > **Native app in progress.** See `CAPSULE_NATIVE.md` for the Swift/SwiftUI roadmap that
 > will replace this PWA. The PWA is the working prototype; the native app is the target.
 
-## Vault Context
+## Planning & Docs
 
-Product planning, backlogs, and design decisions live in the Obsidian vault:
-- **Vault:** `~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Optimistic Staircase/`
-- **Project notes:** `30-39 Indy App Dev/35 Clothes Inventory/`
-- **Backlog:** `30-39 Indy App Dev/35 Clothes Inventory/Backlog.md`
-- **Development Index:** `30-39 Indy App Dev/Development Index.md`
-
-Read the vault backlog before starting a new feature. Keep this file technical-only.
+Product planning for Capsule (backlog, MVP roadmap, concept) lives in the private Capsule native repo (its `docs/` folder), not here: this repo is public. **Parked since July 13, 2026** — resume only when Yev says so. Keep this file technical-only.
 
 ---
 

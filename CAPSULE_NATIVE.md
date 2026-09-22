@@ -406,7 +406,7 @@ These were in the web prototype spec and can wait:
 - Multi-profile UI (data model supports it, but single-profile UX is simpler to ship)
 - Comparison quiz / Elo ranking (Phase 4+ of the original spec)
 - Virtual try-on (requires third-party API or diffusion model — revisit when the core is solid)
-- Baby/child growth tracking (add when the core family use case is proven)
+- Per-profile size history (add when multi-profile use is proven)
 
 ---
 

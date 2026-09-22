@@ -29,8 +29,8 @@ If a feature needs a different resolution, derive it at request time from `compr
 
 ### 3. Multi-profile data model from day one
 
-`ownerId` is on every `Garment`, `Outfit`, and `WearLog`. The family wardrobe
-is the intended end state. Retrofitting ownerId later means a schema migration
+`ownerId` is on every `Garment`, `Outfit`, and `WearLog`. Multiple wardrobes
+are the intended end state. Retrofitting ownerId later means a schema migration
 on real user data — painful. The UI for switching profiles can arrive later;
 the data layer cannot.
 

@@ -1,6 +1,6 @@
 # Capsule
 
-A local-first wardrobe inventory PWA for families. Dark, editorial, offline-first.
+A local-first wardrobe inventory PWA. Dark, editorial, offline-first.
 
 **Live app → [yevrap.github.io/Capsule-Wardrobe](https://yevrap.github.io/Capsule-Wardrobe/)**
 
@@ -9,7 +9,7 @@ A local-first wardrobe inventory PWA for families. Dark, editorial, offline-firs
 ## What it does
 
 - Catalogue your wardrobe with photos, tags, brand, price, notes
-- Multiple profiles — one app for the whole family
+- Multiple profiles in one app
 - Create and save outfits from items in your wardrobe
 - Search and filter by category, tag, or text
 - Full backup and restore per profile (ZIP file, works on iOS, Android, and desktop)
